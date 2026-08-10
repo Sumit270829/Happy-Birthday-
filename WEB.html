@@ -19,12 +19,33 @@ html {
 
 body {
     font-family: "Poppins", Arial, sans-serif;
-    color: white;
+    color: #fff;
     background:
-        radial-gradient(circle at top left, #ff7eb3, transparent 35%),
-        radial-gradient(circle at bottom right, #8e44ad, transparent 35%),
-        linear-gradient(135deg, #16001f, #4b0b35, #17001f);
+        radial-gradient(circle at 15% 10%, rgba(255, 92, 154, .16), transparent 28%),
+        radial-gradient(circle at 85% 90%, rgba(142, 68, 173, .18), transparent 30%),
+        linear-gradient(135deg, #07030b 0%, #170813 45%, #09030d 100%);
     overflow-x: hidden;
+    position: relative;
+}
+
+/* Cinematic film grain + vignette */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,.48) 100%),
+        repeating-linear-gradient(
+            0deg,
+            rgba(255,255,255,.018) 0,
+            rgba(255,255,255,.018) 1px,
+            transparent 1px,
+            transparent 3px
+        );
+    mix-blend-mode: overlay;
+    opacity: .55;
 }
 
 /* ================= FLOATING HEARTS ================= */
@@ -61,10 +82,12 @@ body {
     top: 20px;
     right: 20px;
     z-index: 100;
-    border: 1px solid rgba(255,255,255,.4);
-    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.22);
+    background: linear-gradient(135deg, rgba(255,255,255,.14), rgba(255,255,255,.05));
     color: white;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 12px 35px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.18);
     padding: 12px 18px;
     border-radius: 50px;
     cursor: pointer;
@@ -85,8 +108,8 @@ body {
 }
 
 .hero-content {
-    max-width: 800px;
-    animation: heroIn 1.5s ease;
+    max-width: 900px;
+    animation: heroIn 1.5s cubic-bezier(.16,1,.3,1);
 }
 
 @keyframes heroIn {
@@ -111,9 +134,12 @@ body {
 h1 {
     font-size: clamp(45px, 9vw, 90px);
     line-height: 1;
-    text-shadow:
-        0 0 10px #ff5c9a,
-        0 0 30px #ff2f81;
+    letter-spacing: -2px;
+    background: linear-gradient(135deg, #fff 10%, #ffd3e6 45%, #ff6fa7 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 12px 45px rgba(255, 47, 129, .22);
 }
 
 .name {
@@ -139,12 +165,12 @@ h1 {
     color: #d71968;
     background: white;
     font-weight: bold;
-    transition: .3s;
+    transition: .35s ease;
 }
 
 .scroll-btn:hover {
     transform: scale(1.08);
-    box-shadow: 0 0 30px rgba(255,255,255,.7);
+    box-shadow: 0 14px 45px rgba(255, 72, 140, .28), inset 0 1px 0 rgba(255,255,255,.25);
 }
 
 /* ================= SECTIONS ================= */
@@ -174,11 +200,14 @@ section {
     position: relative;
     width: 100%;
     overflow: hidden;
-    border-radius: 30px;
+    border-radius: 28px;
+    border: 1px solid rgba(255,255,255,.14);
+    background: rgba(255,255,255,.035);
 
     box-shadow:
-        0 20px 60px rgba(0,0,0,.5),
-        0 0 40px rgba(255,100,170,.3);
+        0 30px 90px rgba(0,0,0,.65),
+        0 0 60px rgba(255,80,160,.13),
+        inset 0 1px 0 rgba(255,255,255,.12);
 }
 
 .main-photo {
@@ -189,8 +218,10 @@ section {
     border-radius: 30px;
 
     transition:
-        opacity .7s ease,
-        transform .7s ease;
+        opacity .8s ease,
+        transform 1.2s cubic-bezier(.16,1,.3,1),
+        filter .8s ease;
+    filter: saturate(.94) contrast(1.04);
 }
 
 /* ================= TRANSPARENT MESSAGE ================= */
@@ -205,9 +236,15 @@ section {
 
     text-align: center;
 
-    background: rgba(0, 0, 0, 0.38);
+    background: linear-gradient(
+        to top,
+        rgba(3,2,7,.88) 0%,
+        rgba(3,2,7,.62) 48%,
+        rgba(3,2,7,0) 100%
+    );
 
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(5px);
 
     border-top: 1px solid rgba(255,255,255,0.25);
@@ -258,13 +295,11 @@ section {
     padding: 45px 35px;
     border-radius: 30px;
 
-    background: rgba(255,255,255,.1);
-
-    backdrop-filter: blur(15px);
-
-    border: 1px solid rgba(255,255,255,.2);
-
-    box-shadow: 0 20px 60px rgba(0,0,0,.3);
+    background: linear-gradient(135deg, rgba(255,255,255,.11), rgba(255,255,255,.035));
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border: 1px solid rgba(255,255,255,.15);
+    box-shadow: 0 30px 90px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.12);
 
     text-align: center;
 }
@@ -288,16 +323,17 @@ section {
     max-width: 700px;
     width: 100%;
 
-    background: #fff5f8;
+    background:
+        linear-gradient(rgba(255,255,255,.96), rgba(255,247,250,.96)),
+        repeating-linear-gradient(0deg, transparent 0 28px, rgba(194,24,91,.035) 29px);
     color: #63123c;
 
     padding: 50px 40px;
 
     border-radius: 10px;
 
-    box-shadow: 0 25px 80px rgba(0,0,0,.5);
-
-    transform: rotate(-1deg);
+    box-shadow: 0 35px 100px rgba(0,0,0,.58), 0 0 45px rgba(255,90,155,.08);
+    transform: rotate(-.7deg);
 }
 
 .letter h2 {
@@ -461,10 +497,11 @@ footer {
     position: relative;
     overflow: hidden;
     border-radius: 30px;
-    background: rgba(255,255,255,.1);
-    border: 1px solid rgba(255,255,255,.2);
-    backdrop-filter: blur(15px);
-    box-shadow: 0 20px 60px rgba(0,0,0,.5), 0 0 40px rgba(255,100,170,.3);
+    background: linear-gradient(135deg, rgba(255,255,255,.11), rgba(255,255,255,.035));
+    border: 1px solid rgba(255,255,255,.15);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    box-shadow: 0 30px 90px rgba(0,0,0,.62), 0 0 55px rgba(255,100,170,.12), inset 0 1px 0 rgba(255,255,255,.12);
     padding: 10px;
 }
 
@@ -474,6 +511,7 @@ footer {
     object-fit: cover;
     display: block;
     border-radius: 22px;
+    filter: saturate(.92) contrast(1.05);
 }
 
 .video-title {
@@ -499,10 +537,852 @@ footer {
     }
 }
 
+
+/* ================= CINEMATIC POLISH ================= */
+
+.hero::after {
+    content: "";
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    bottom: 5%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.25), transparent);
+    opacity: .5;
+}
+
+.section-title {
+    letter-spacing: -.5px;
+    text-shadow: 0 10px 35px rgba(255,80,150,.18);
+}
+
+.photo-container::after,
+.video-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.04), inset 0 -80px 120px rgba(0,0,0,.12);
+}
+
+.video-card video {
+    background: #050308;
+}
+
+.surprise-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.surprise-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 70%;
+    height: 100%;
+    transform: skewX(-20deg);
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.28), transparent);
+    animation: shine 3.8s ease-in-out infinite;
+}
+
+@keyframes shine {
+    0%, 55% { left: -120%; }
+    75%, 100% { left: 150%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+
+/* =========================================================
+   FULL CINEMATIC EXPERIENCE — PREMIUM ADDITIONS
+   ========================================================= */
+
+/* Intro cinematic curtain */
+#cinematicIntro {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background:
+        radial-gradient(circle at 50% 45%, rgba(255,80,150,.16), transparent 28%),
+        linear-gradient(135deg, #050207, #170712 55%, #050207);
+    transition: opacity 1.2s ease, visibility 1.2s ease;
+}
+#cinematicIntro.hide {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+.intro-inner {
+    width: min(760px, 90%);
+    animation: introRise 1.6s cubic-bezier(.16,1,.3,1);
+}
+.intro-kicker {
+    font-size: 12px;
+    letter-spacing: 7px;
+    color: #f6bfd5;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+}
+.intro-title {
+    font-size: clamp(42px, 8vw, 86px);
+    line-height: .98;
+    font-weight: 700;
+    letter-spacing: -3px;
+    background: linear-gradient(135deg, #fff, #ffd2e4 50%, #ff6fa8);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+.intro-subtitle {
+    margin: 25px auto 32px;
+    color: rgba(255,255,255,.72);
+    font-size: 16px;
+    letter-spacing: 1px;
+}
+.enter-btn {
+    border: 1px solid rgba(255,255,255,.22);
+    border-radius: 999px;
+    padding: 15px 30px;
+    color: #fff;
+    background: rgba(255,255,255,.08);
+    backdrop-filter: blur(18px);
+    cursor: pointer;
+    font-size: 15px;
+    transition: .35s ease;
+    box-shadow: 0 15px 45px rgba(0,0,0,.35);
+}
+.enter-btn:hover {
+    transform: translateY(-3px) scale(1.03);
+    background: rgba(255,255,255,.14);
+    box-shadow: 0 20px 55px rgba(255,65,135,.2);
+}
+@keyframes introRise {
+    from { opacity:0; transform:translateY(35px) scale(.97); }
+    to { opacity:1; transform:translateY(0) scale(1); }
+}
+
+/* Progress bar */
+#scrollProgress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 2px;
+    z-index: 10001;
+    background: linear-gradient(90deg, #ff4f96, #ffd3e5, #c678ff);
+    box-shadow: 0 0 15px rgba(255,80,150,.8);
+}
+
+/* Ambient glow */
+.ambient-orb {
+    position: fixed;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    pointer-events: none;
+    filter: blur(80px);
+    opacity: .12;
+    z-index: 0;
+    background: #ff3f88;
+    animation: orbDrift 16s ease-in-out infinite alternate;
+}
+.orb-one { top: 12%; left: -130px; }
+.orb-two { bottom: 8%; right: -130px; background:#9e52ff; animation-delay:-7s; }
+@keyframes orbDrift {
+    from { transform: translate(0,0) scale(.85); }
+    to { transform: translate(70px,50px) scale(1.15); }
+}
+
+/* Section dividers */
+.cinematic-divider {
+    width: min(700px, 78%);
+    height: 1px;
+    margin: -30px auto 50px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.25), transparent);
+}
+
+/* Memory timeline */
+.memory-timeline {
+    max-width: 900px;
+    margin: 20px auto 0;
+    position: relative;
+}
+.memory-timeline::before {
+    content:"";
+    position:absolute;
+    left:50%;
+    top:0;
+    bottom:0;
+    width:1px;
+    background:linear-gradient(transparent, rgba(255,255,255,.25), transparent);
+}
+.memory-item {
+    width:50%;
+    padding:18px 45px;
+    position:relative;
+}
+.memory-item:nth-child(odd) { margin-left:0; text-align:right; }
+.memory-item:nth-child(even) { margin-left:50%; }
+.memory-dot {
+    position:absolute;
+    top:30px;
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:#fff;
+    box-shadow:0 0 0 5px rgba(255,255,255,.07), 0 0 25px rgba(255,75,145,.8);
+}
+.memory-item:nth-child(odd) .memory-dot { right:-5px; }
+.memory-item:nth-child(even) .memory-dot { left:-5px; }
+.memory-card {
+    display:inline-block;
+    max-width:420px;
+    padding:22px;
+    border-radius:22px;
+    text-align:left;
+    background:linear-gradient(135deg,rgba(255,255,255,.10),rgba(255,255,255,.035));
+    border:1px solid rgba(255,255,255,.13);
+    backdrop-filter:blur(18px);
+    box-shadow:0 20px 55px rgba(0,0,0,.3);
+}
+.memory-year {
+    color:#ff9fc3;
+    font-size:12px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+}
+.memory-card h3 { margin:8px 0; color:#fff; }
+.memory-card p { color:rgba(255,255,255,.68); line-height:1.7; font-size:14px; }
+
+/* Reasons cards */
+.reasons-grid {
+    max-width:1000px;
+    margin:auto;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+}
+.reason-card {
+    padding:28px 22px;
+    min-height:170px;
+    border-radius:24px;
+    background:linear-gradient(145deg,rgba(255,255,255,.10),rgba(255,255,255,.035));
+    border:1px solid rgba(255,255,255,.12);
+    backdrop-filter:blur(18px);
+    box-shadow:0 20px 55px rgba(0,0,0,.28);
+    transition:.4s ease;
+}
+.reason-card:hover {
+    transform:translateY(-8px);
+    border-color:rgba(255,150,190,.35);
+    box-shadow:0 28px 65px rgba(0,0,0,.4), 0 0 35px rgba(255,70,140,.1);
+}
+.reason-icon { font-size:30px; margin-bottom:12px; }
+.reason-card h3 { margin-bottom:8px; }
+.reason-card p { color:rgba(255,255,255,.68); line-height:1.6; font-size:14px; }
+
+/* Countdown */
+.countdown-wrap {
+    max-width:760px;
+    margin:0 auto;
+    text-align:center;
+}
+.countdown-label {
+    color:rgba(255,255,255,.65);
+    letter-spacing:3px;
+    font-size:12px;
+    text-transform:uppercase;
+    margin-bottom:20px;
+}
+.countdown {
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+}
+.count-box {
+    padding:22px 10px;
+    border-radius:20px;
+    background:rgba(255,255,255,.065);
+    border:1px solid rgba(255,255,255,.12);
+    backdrop-filter:blur(16px);
+}
+.count-box strong {
+    display:block;
+    font-size:clamp(28px,5vw,46px);
+    background:linear-gradient(135deg,#fff,#ff9fc3);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+}
+.count-box span {
+    color:rgba(255,255,255,.5);
+    font-size:10px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+}
+
+/* ================= SECRET ENVELOPE — TRUE CLOSED DESIGN ================= */
+.envelope-area {
+    text-align: center;
+    max-width: 800px;
+    margin: auto;
+}
+
+.envelope {
+    position: relative;
+    width: min(520px, 90%);
+    height: 330px;
+    margin: 34px auto 18px;
+    cursor: pointer;
+    perspective: 1200px;
+    transform-style: preserve-3d;
+}
+
+.envelope-back {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+    border-radius: 18px;
+    background: linear-gradient(145deg, #8d174e, #4b0b35);
+    box-shadow: 0 35px 80px rgba(0,0,0,.55);
+}
+
+/* Letter is INSIDE the envelope pocket */
+.envelope-letter {
+    position: absolute;
+    z-index: 2;
+    left: 9%;
+    bottom: 8%;
+    width: 82%;
+    height: 74%;
+    padding: 25px 28px;
+    overflow: hidden;
+    border-radius: 10px;
+    background: #fff7fa;
+    color: #63123c;
+    box-shadow: 0 8px 25px rgba(0,0,0,.25);
+    transform: translateY(0);
+    transition: transform .85s cubic-bezier(.16,1,.3,1);
+}
+
+/* Envelope front/pocket covers the lower portion of the letter */
+.envelope-pocket {
+    position: absolute;
+    inset: auto 0 0;
+    z-index: 3;
+    height: 66%;
+    border-radius: 0 0 18px 18px;
+    background: linear-gradient(145deg, #751440, #42102f);
+    clip-path: polygon(0 0, 50% 55%, 100% 0, 100% 100%, 0 100%);
+}
+
+/* Flap sits above everything while closed */
+.envelope-flap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 65%;
+    z-index: 4;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    transform-origin: top center;
+    background: linear-gradient(145deg, #b52266, #641039);
+    filter: drop-shadow(0 7px 12px rgba(0,0,0,.25));
+    transition: transform .85s cubic-bezier(.16,1,.3,1);
+}
+
+/* Closed = letter remains completely inside */
+.envelope:not(.open) .envelope-letter {
+    transform: translateY(0);
+}
+
+/* Open = letter comes only partway out, still overlapping the envelope */
+.envelope.open .envelope-flap {
+    transform: rotateX(180deg);
+    z-index: 1;
+}
+
+.envelope.open .envelope-letter {
+    transform: translateY(-72px);
+    z-index: 5;
+}
+
+/* Keep the pocket visually in front of the lower part of the letter */
+.envelope.open .envelope-pocket {
+    z-index: 4;
+}
+
+.envelope-hint {
+    color: rgba(255,255,255,.6);
+    font-size: 13px;
+    transition: opacity .3s ease;
+}
+
+@media(max-width:600px) {
+    .envelope {
+        height: 270px;
+    }
+
+    .envelope-letter {
+        height: 72%;
+        padding: 20px;
+        font-size: 13px;
+    }
+
+    .envelope.open .envelope-letter {
+        transform: translateY(-55px);
+    }
+}
+
+/* Full-screen final scene */
+#finalScene {
+    position:fixed;
+    inset:0;
+    z-index:10002;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:30px;
+    background:
+        radial-gradient(circle at center, rgba(255,55,135,.16), transparent 30%),
+        rgba(3,1,6,.96);
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity 1s ease, visibility 1s ease;
+}
+#finalScene.show {
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+}
+.final-scene-inner { max-width:900px; animation:finalRise 1.3s cubic-bezier(.16,1,.3,1); }
+.final-kicker {
+    font-size:12px;
+    letter-spacing:7px;
+    color:#ffb5d1;
+}
+.final-title {
+    margin:18px 0;
+    font-size:clamp(48px,10vw,105px);
+    line-height:.9;
+    letter-spacing:-4px;
+    background:linear-gradient(135deg,#fff,#ffd2e4 45%,#ff5798);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+}
+.final-subtitle {
+    color:rgba(255,255,255,.72);
+    font-size:clamp(16px,2vw,21px);
+    line-height:1.8;
+}
+.close-final {
+    margin-top:30px;
+    padding:12px 24px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.2);
+    color:#fff;
+    background:rgba(255,255,255,.07);
+    cursor:pointer;
+}
+@keyframes finalRise {
+    from { opacity:0; transform:translateY(45px) scale(.96); }
+    to { opacity:1; transform:translateY(0) scale(1); }
+}
+
+/* Back-to-top */
+#topBtn {
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,.15);
+    background:rgba(0,0,0,.3);
+    color:#fff;
+    backdrop-filter:blur(14px);
+    cursor:pointer;
+    opacity:0;
+    transform:translateY(15px);
+    pointer-events:none;
+    transition:.3s ease;
+    z-index:100;
+}
+#topBtn.show { opacity:1; transform:translateY(0); pointer-events:auto; }
+
+@media(max-width:700px) {
+    .memory-timeline::before { left:8px; }
+    .memory-item,
+    .memory-item:nth-child(even) {
+        width:100%;
+        margin-left:0;
+        text-align:left;
+        padding:15px 10px 15px 32px;
+    }
+    .memory-item:nth-child(odd) .memory-dot,
+    .memory-item:nth-child(even) .memory-dot {
+        left:3px;
+        right:auto;
+    }
+    .reasons-grid { grid-template-columns:1fr; }
+    .countdown { gap:8px; }
+    .count-box { padding:16px 5px; }
+    .envelope { height:250px; }
+    .envelope-letter { padding:20px; font-size:13px; }
+}
+
+
+/* ================= FINAL ENVELOPE FIX ================= */
+.envelope {
+    position: relative !important;
+    width: min(520px, 90%) !important;
+    height: 330px !important;
+    margin: 34px auto 18px !important;
+    overflow: visible !important;
+    perspective: 1200px !important;
+    transform-style: preserve-3d !important;
+}
+
+.envelope-back {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 1 !important;
+    border-radius: 18px !important;
+    overflow: hidden !important;
+    background: linear-gradient(145deg,#8d174e,#4b0b35) !important;
+}
+
+.envelope-letter {
+    position: absolute !important;
+    left: 9% !important;
+    bottom: 7% !important;
+    width: 82% !important;
+    height: 78% !important;
+    z-index: 2 !important;
+    transform: translateY(0) !important;
+    padding: 24px 28px !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+    background: #fff7fa !important;
+    color: #63123c !important;
+    box-shadow: 0 8px 25px rgba(0,0,0,.25) !important;
+    transition: transform .85s cubic-bezier(.16,1,.3,1) !important;
+}
+
+/* This is the physical front pocket. It hides the letter when closed. */
+.envelope-pocket {
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    height: 67% !important;
+    z-index: 3 !important;
+    border-radius: 0 0 18px 18px !important;
+    background: linear-gradient(145deg,#751440,#42102f) !important;
+    clip-path: polygon(0 0,50% 55%,100% 0,100% 100%,0 100%) !important;
+}
+
+/* The flap covers the top of the letter when closed. */
+.envelope-flap {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 66% !important;
+    z-index: 4 !important;
+    clip-path: polygon(0 0,100% 0,50% 100%) !important;
+    transform-origin: top center !important;
+    background: linear-gradient(145deg,#b52266,#641039) !important;
+    transition: transform .85s cubic-bezier(.16,1,.3,1) !important;
+}
+
+/* CLOSED: letter is completely behind the front pocket. */
+.envelope:not(.open) .envelope-letter {
+    transform: translateY(0) !important;
+    z-index: 2 !important;
+}
+
+/* OPEN: flap lifts, then the letter slides only part-way out. */
+.envelope.open .envelope-flap {
+    transform: rotateX(180deg) !important;
+    z-index: 1 !important;
+}
+
+.envelope.open .envelope-letter {
+    transform: translateY(-78px) !important;
+    z-index: 5 !important;
+}
+
+/* Pocket remains in front of the bottom of the letter. */
+.envelope.open .envelope-pocket {
+    z-index: 4 !important;
+}
+
+@media (max-width:600px) {
+    .envelope {
+        height: 275px !important;
+    }
+    .envelope-letter {
+        padding: 18px 20px !important;
+        font-size: 13px !important;
+    }
+    .envelope.open .envelope-letter {
+        transform: translateY(-55px) !important;
+    }
+}
+
+
+/* ================= LETTER READABILITY FIX ================= */
+.envelope-letter {
+    box-sizing: border-box !important;
+    display: block !important;
+    text-align: left !important;
+    line-height: 1.65 !important;
+    font-size: 14px !important;
+    color: #5b173b !important;
+    padding: 28px 30px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: thin !important;
+}
+
+.envelope-letter h3 {
+    margin: 0 0 14px !important;
+    font-size: 22px !important;
+    line-height: 1.25 !important;
+    color: #7a174b !important;
+    position: relative !important;
+    z-index: 2 !important;
+}
+
+.envelope-letter p {
+    margin: 0 !important;
+    color: #5b173b !important;
+    line-height: 1.75 !important;
+    position: relative !important;
+    z-index: 2 !important;
+}
+
+.envelope-letter::after {
+    display: none !important;
+}
+
+/* When opened, give the paper enough room to be read. */
+.envelope.open .envelope-letter {
+    transform: translateY(-105px) !important;
+    height: 82% !important;
+    z-index: 5 !important;
+    box-shadow: 0 25px 55px rgba(0,0,0,.38) !important;
+}
+
+/* Keep the bottom pocket behind the readable part of the letter. */
+.envelope.open .envelope-pocket {
+    z-index: 4 !important;
+}
+
+/* Closed state remains fully hidden inside the envelope. */
+.envelope:not(.open) .envelope-letter {
+    transform: translateY(0) !important;
+    z-index: 2 !important;
+}
+
+@media (max-width: 600px) {
+    .envelope-letter {
+        padding: 22px 20px !important;
+        font-size: 12.5px !important;
+        line-height: 1.6 !important;
+    }
+
+    .envelope-letter h3 {
+        font-size: 19px !important;
+        margin-bottom: 10px !important;
+    }
+
+    .envelope.open .envelope-letter {
+        transform: translateY(-70px) !important;
+        height: 84% !important;
+    }
+}
+
+
+/* ================= FINAL CLOSED-ENVELOPE HIDING FIX ================= */
+
+/* The closed envelope clips everything to its own shape. */
+.envelope {
+    overflow: hidden !important;
+}
+
+/* Closed: the letter is completely behind the front pocket/flap.
+   Nothing from the message can peek outside. */
+.envelope:not(.open) .envelope-letter {
+    transform: translateY(55px) !important;
+    z-index: 2 !important;
+    opacity: 1 !important;
+    pointer-events: none !important;
+}
+
+/* Keep the pocket and flap above the letter while closed. */
+.envelope:not(.open) .envelope-pocket {
+    z-index: 3 !important;
+}
+
+.envelope:not(.open) .envelope-flap {
+    z-index: 4 !important;
+}
+
+/* Open: restore the readable paper and allow it to extend above
+   the envelope without clipping. */
+.envelope.open {
+    overflow: visible !important;
+}
+
+.envelope.open .envelope-letter {
+    transform: translateY(-105px) !important;
+    z-index: 5 !important;
+    pointer-events: auto !important;
+}
+
+.envelope.open .envelope-pocket {
+    z-index: 4 !important;
+}
+
+.envelope.open .envelope-flap {
+    z-index: 1 !important;
+}
+
+/* On small screens, keep the closed letter completely hidden too. */
+@media (max-width: 600px) {
+    .envelope:not(.open) .envelope-letter {
+        transform: translateY(45px) !important;
+    }
+
+    .envelope.open .envelope-letter {
+        transform: translateY(-70px) !important;
+    }
+}
+
+
+/* ============================================================
+   ABSOLUTE FINAL ENVELOPE FIX
+   CLOSED = MESSAGE 100% HIDDEN
+   OPEN   = MESSAGE VISIBLE
+   ============================================================ */
+
+/* Envelope itself remains a fixed closed shape. */
+.envelope {
+    position: relative !important;
+    overflow: hidden !important;
+    isolation: isolate !important;
+}
+
+/* CLOSED: physically push the complete letter below the pocket.
+   The envelope clips it, so NO heading, paragraph, or text can show. */
+.envelope:not(.open) .envelope-letter {
+    position: absolute !important;
+    top: 115% !important;
+    bottom: auto !important;
+    transform: none !important;
+    z-index: 1 !important;
+    opacity: 1 !important;
+}
+
+/* Closed layers are all above the hidden letter. */
+.envelope:not(.open) .envelope-back {
+    z-index: 1 !important;
+}
+.envelope:not(.open) .envelope-letter {
+    z-index: 2 !important;
+}
+.envelope:not(.open) .envelope-pocket {
+    z-index: 3 !important;
+}
+.envelope:not(.open) .envelope-flap {
+    z-index: 4 !important;
+}
+
+/* OPEN: allow the envelope to reveal the paper. */
+.envelope.open {
+    overflow: visible !important;
+}
+
+.envelope.open .envelope-back {
+    z-index: 1 !important;
+}
+
+.envelope.open .envelope-letter {
+    top: auto !important;
+    left: 9% !important;
+    bottom: 7% !important;
+    transform: translateY(-105px) !important;
+    z-index: 5 !important;
+    opacity: 1 !important;
+}
+
+.envelope.open .envelope-pocket {
+    z-index: 4 !important;
+}
+
+.envelope.open .envelope-flap {
+    z-index: 1 !important;
+}
+
+/* Extra protection: closed state hides every child that belongs
+   to the letter, regardless of its content. */
+.envelope:not(.open) .envelope-letter * {
+    visibility: hidden !important;
+}
+
+.envelope.open .envelope-letter * {
+    visibility: visible !important;
+}
+
+@media (max-width: 600px) {
+    .envelope:not(.open) .envelope-letter {
+        top: 118% !important;
+    }
+
+    .envelope.open .envelope-letter {
+        bottom: 7% !important;
+        transform: translateY(-70px) !important;
+    }
+}
+
 </style>
 </head>
 
 <body>
+
+<!-- ================= CINEMATIC INTRO ================= -->
+<div id="cinematicIntro">
+    <div class="intro-inner">
+        <div class="intro-kicker">A PRIVATE LITTLE FILM • 27 AUG</div>
+        <div class="intro-title">For Someone<br>Truly Special</div>
+        <div class="intro-subtitle">A few memories, a few words, and one little surprise made especially for you.</div>
+        <button class="enter-btn" onclick="enterExperience()">▶ Enter the Story</button>
+    </div>
+</div>
+
+<div id="scrollProgress"></div>
+<div class="ambient-orb orb-one"></div>
+<div class="ambient-orb orb-two"></div>
+
 
 <!-- ================= MUSIC ================= -->
 
@@ -624,6 +1504,77 @@ footer {
 </section>
 
 
+
+
+
+<!-- ================= COUNTDOWN ================= -->
+<section id="countdownSection">
+    <h2 class="section-title">⏳ Until Your Special Day</h2>
+    <div class="cinematic-divider"></div>
+    <div class="countdown-wrap">
+        <div class="countdown-label">Counting down to 27 August</div>
+        <div class="countdown" id="countdown">
+            <div class="count-box"><strong id="cdDays">00</strong><span>Days</span></div>
+            <div class="count-box"><strong id="cdHours">00</strong><span>Hours</span></div>
+            <div class="count-box"><strong id="cdMinutes">00</strong><span>Minutes</span></div>
+            <div class="count-box"><strong id="cdSeconds">00</strong><span>Seconds</span></div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= MEMORY TIMELINE ================= -->
+<section id="timeline">
+    <h2 class="section-title">🎞️ A Little Timeline</h2>
+    <div class="cinematic-divider"></div>
+    <div class="memory-timeline">
+        <div class="memory-item">
+            <span class="memory-dot"></span>
+            <div class="memory-card">
+                <div class="memory-year">Chapter 01</div>
+                <h3>The Beginning ✨</h3>
+                <p>Some moments start quietly, but later become the memories we never want to lose.</p>
+            </div>
+        </div>
+        <div class="memory-item">
+            <span class="memory-dot"></span>
+            <div class="memory-card">
+                <div class="memory-year">Chapter 02</div>
+                <h3>The Little Things 🌸</h3>
+                <p>It is often the small conversations, smiles and ordinary days that become the most special.</p>
+            </div>
+        </div>
+        <div class="memory-item">
+            <span class="memory-dot"></span>
+            <div class="memory-card">
+                <div class="memory-year">Chapter 03</div>
+                <h3>The Memories ❤️</h3>
+                <p>Photos freeze a second in time. The feeling behind them is what makes them unforgettable.</p>
+            </div>
+        </div>
+        <div class="memory-item">
+            <span class="memory-dot"></span>
+            <div class="memory-card">
+                <div class="memory-year">Chapter 04</div>
+                <h3>The "End"… 🎬</h3>
+                <p>Maybe this is the end of the story "But".</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= REASONS ================= -->
+<section id="reasons">
+    <h2 class="section-title">💖 A Few Reasons You're Special</h2>
+    <div class="cinematic-divider"></div>
+    <div class="reasons-grid">
+        <div class="reason-card"><div class="reason-icon">🌷</div><h3>Your Smile</h3><p>Because somehow it can make an ordinary moment feel a little brighter.</p></div>
+        <div class="reason-card"><div class="reason-icon">✨</div><h3>Your Energy</h3><p>You have a way of making memories feel more alive and meaningful.</p></div>
+        <div class="reason-card"><div class="reason-icon">🌙</div><h3>Your Presence</h3><p>Some people don't need to say much. Just being there is enough.</p></div>
+        <div class="reason-card"><div class="reason-icon">🥺</div><h3>The Memories</h3><p>The little moments are the ones that stay in the heart long after the day is over.</p></div>
+        <div class="reason-card"><div class="reason-icon">🌹</div><h3>Your Heart</h3><p>Kindness, warmth and the little things you do can mean more than you realize.</p></div>
+        <div class="reason-card"><div class="reason-icon">🎬</div><h3>Our Story End's</h3><p>Every good story deserves a few beautiful scenes worth remembering.</p></div>
+    </div>
+</section>
 
 
 <!-- ================= VIDEO MEMORIES ================= -->
@@ -749,6 +1700,36 @@ footer {
 </section>
 
 
+
+<!-- ================= SECRET LETTER ================= -->
+<section id="secretLetter" class="envelope-area">
+    <h2 class="section-title">💌 A Secret Letter</h2>
+    <div class="cinematic-divider"></div>
+    <p class="envelope-hint" id="envelopeHint">Tap the envelope to open it.</p>
+    <div class="envelope" id="envelope" onclick="openEnvelope()">
+        <!-- Back of the envelope -->
+        <div class="envelope-back"></div>
+
+        <!-- Letter starts completely INSIDE the envelope -->
+        <div class="envelope-letter">
+            <h3 style="margin-bottom:15px;">For You ❤️</h3>
+            <p style="line-height:1.75;">
+                I LOVE U A LOT...💕❤️🌹✨
+                <br><br>
+                mera birthday pe tuna mujha ek pyara sa msg bheja tha mena tera liya kuch nhi kiya tha isliya ya kr rha hu
+                or ha iska bad msg ni karunga 
+                sorry....🥺🥺🥺or BYY✨💕 Take Care✨❤️ </p>
+        </div>
+
+        <!-- Front pocket physically hides the lower part of the letter -->
+        <div class="envelope-pocket"></div>
+
+        <!-- Top flap closes over everything -->
+        <div class="envelope-flap"></div>
+    </div>
+</section>
+
+
 <!-- ================= FINAL SURPRISE ================= -->
 
 <section class="surprise">
@@ -763,7 +1744,7 @@ footer {
     <button class="surprise-btn"
             onclick="showSurprise()">
 
-        💖 Open Your Surprise
+        💖 Open The Final Surprise
 
     </button>
 
@@ -968,8 +1949,18 @@ setInterval(() => {
 
         /* Change photo */
 
+        image.style.transform = "scale(1.025)";
+        image.style.filter = "saturate(.88) contrast(1.08)";
+
         image.src =
             photos[currentPhoto];
+
+        image.onload = () => {
+            requestAnimationFrame(() => {
+                image.style.transform = "scale(1)";
+                image.style.filter = "saturate(.94) contrast(1.04)";
+            });
+        };
 
 
         /* Change big transparent message */
@@ -1335,11 +2326,137 @@ for (
 
 }
 
+
+/* =====================================================
+   FULL CINEMATIC EXPERIENCE
+   ===================================================== */
+
+function enterExperience() {
+    const intro = document.getElementById("cinematicIntro");
+    intro.classList.add("hide");
+
+    const music = document.getElementById("music");
+    if (music && music.paused) {
+        music.play().then(() => {
+            musicButton.innerHTML = "🔊 Music On";
+        }).catch(() => {});
+    }
+
+    setTimeout(() => {
+        document.querySelector(".hero")?.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+    }, 550);
+}
+
+/* Scroll progress + top button */
+function updateCinematicUI() {
+    const scrollTop = window.scrollY;
+    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = maxScroll > 0 ? (scrollTop / maxScroll) * 100 : 0;
+
+    const bar = document.getElementById("scrollProgress");
+    if (bar) bar.style.width = progress + "%";
+
+    const topBtn = document.getElementById("topBtn");
+    if (topBtn) topBtn.classList.toggle("show", scrollTop > 650);
+}
+window.addEventListener("scroll", updateCinematicUI, {passive:true});
+updateCinematicUI();
+
+/* Birthday countdown — next 27 August */
+function updateBirthdayCountdown() {
+    const now = new Date();
+    let target = new Date(now.getFullYear(), 7, 27, 0, 0, 0);
+
+    if (now >= target) {
+        target = new Date(now.getFullYear() + 1, 7, 27, 0, 0, 0);
+    }
+
+    const diff = target - now;
+    const days = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff / 3600000) % 24);
+    const minutes = Math.floor((diff / 60000) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+
+    document.getElementById("cdDays").textContent = String(days).padStart(2,"0");
+    document.getElementById("cdHours").textContent = String(hours).padStart(2,"0");
+    document.getElementById("cdMinutes").textContent = String(minutes).padStart(2,"0");
+    document.getElementById("cdSeconds").textContent = String(seconds).padStart(2,"0");
+}
+updateBirthdayCountdown();
+setInterval(updateBirthdayCountdown, 1000);
+
+/* Envelope */
+function openEnvelope() {
+    const envelope = document.getElementById("envelope");
+    const hint = document.getElementById("envelopeHint");
+
+    if (!envelope) return;
+
+    const isOpen = envelope.classList.contains("open");
+
+    if (isOpen) {
+        envelope.classList.remove("open");
+        if (hint) hint.textContent = "Tap the envelope to open it.";
+    } else {
+        envelope.classList.add("open");
+        if (hint) hint.textContent = "Tap the envelope again to close it.";
+    }
+}
+
+/* Full-screen ending */
+function openFinalScene() {
+    document.getElementById("finalScene").classList.add("show");
+    createHearts();
+    createConfetti();
+}
+function closeFinalScene() {
+    document.getElementById("finalScene").classList.remove("show");
+}
+
+/* Upgrade existing surprise to include cinematic finale */
+const originalShowSurprise = showSurprise;
+showSurprise = function() {
+    originalShowSurprise();
+    setTimeout(openFinalScene, 1200);
+};
+
+/* Escape closes cinematic scene */
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeFinalScene();
+});
+
+
+/* Letter readability helper */
+function updateLetterHint() {
+    const letter = document.querySelector(".envelope-letter");
+    if (!letter) return;
+    letter.style.overflowY = letter.scrollHeight > letter.clientHeight ? "auto" : "hidden";
+}
+window.addEventListener("load", updateLetterHint);
+window.addEventListener("resize", updateLetterHint);
+
 </script>
+
+
+<!-- ================= FULL SCREEN FINAL SCENE ================= -->
+<div id="finalScene">
+    <div class="final-scene-inner">
+        <div class="final-kicker">THE END • OR MAYBE JUST THE BEGINNING</div>
+        <div class="final-title">Happy Birthday,<br>Kritika ❤️</div>
+        <div class="final-subtitle">
+            May this year bring you beautiful surprises, peaceful days,
+            unforgettable memories, and a thousand reasons to smile.
+            <br><br>
+            Keep shining. Keep smiling. And never forget how special you are. ✨
+        </div>
+        <button class="close-final" onclick="closeFinalScene()">Close ✕</button>
+    </div>
+</div>
+<button id="topBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
 </body>
 </html>
 
-
-Made for U ❤️✨
-Design by sumit ✨
