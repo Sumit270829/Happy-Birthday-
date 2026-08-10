@@ -1,0 +1,1234 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Happy Birthday, Kritika ❤️</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: "Poppins", Arial, sans-serif;
+    color: white;
+    background:
+        radial-gradient(circle at top left, #ff7eb3, transparent 35%),
+        radial-gradient(circle at bottom right, #8e44ad, transparent 35%),
+        linear-gradient(135deg, #16001f, #4b0b35, #17001f);
+    overflow-x: hidden;
+}
+
+/* ================= FLOATING HEARTS ================= */
+
+.bg-heart {
+    position: fixed;
+    bottom: -50px;
+    z-index: 1;
+    pointer-events: none;
+    animation: floatHeart linear infinite;
+    opacity: 0.7;
+}
+
+@keyframes floatHeart {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: translateY(-110vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* ================= MUSIC BUTTON ================= */
+
+.music-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    border: 1px solid rgba(255,255,255,.4);
+    background: rgba(255,255,255,.15);
+    color: white;
+    backdrop-filter: blur(10px);
+    padding: 12px 18px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* ================= HERO ================= */
+
+.hero {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 30px 20px;
+    position: relative;
+    z-index: 5;
+}
+
+.hero-content {
+    max-width: 800px;
+    animation: heroIn 1.5s ease;
+}
+
+@keyframes heroIn {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.small-text {
+    letter-spacing: 5px;
+    font-size: 14px;
+    color: #ffc7df;
+    margin-bottom: 15px;
+}
+
+h1 {
+    font-size: clamp(45px, 9vw, 90px);
+    line-height: 1;
+    text-shadow:
+        0 0 10px #ff5c9a,
+        0 0 30px #ff2f81;
+}
+
+.name {
+    font-size: clamp(28px, 6vw, 55px);
+    margin-top: 15px;
+    color: #ffd4e7;
+}
+
+.hero-description {
+    max-width: 650px;
+    margin: 25px auto;
+    font-size: 18px;
+    line-height: 1.8;
+    color: #ffeaf3;
+}
+
+.scroll-btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 14px 30px;
+    border-radius: 50px;
+    text-decoration: none;
+    color: #d71968;
+    background: white;
+    font-weight: bold;
+    transition: .3s;
+}
+
+.scroll-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 30px rgba(255,255,255,.7);
+}
+
+/* ================= SECTIONS ================= */
+
+section {
+    min-height: 100vh;
+    padding: 90px 20px;
+    position: relative;
+    z-index: 5;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 42px;
+    margin-bottom: 50px;
+    color: #ffd8e8;
+}
+
+/* ================= 10 PHOTO SLIDESHOW ================= */
+
+.gallery {
+    max-width: 850px;
+    margin: auto;
+}
+
+.photo-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 30px;
+
+    box-shadow:
+        0 20px 60px rgba(0,0,0,.5),
+        0 0 40px rgba(255,100,170,.3);
+}
+
+.main-photo {
+    width: 100%;
+    height: 550px;
+    object-fit: cover;
+    display: block;
+    border-radius: 30px;
+
+    transition:
+        opacity .7s ease,
+        transform .7s ease;
+}
+
+/* ================= TRANSPARENT MESSAGE ================= */
+
+.photo-message {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    padding: 30px 20px;
+
+    text-align: center;
+
+    background: rgba(0, 0, 0, 0.38);
+
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+
+    border-top: 1px solid rgba(255,255,255,0.25);
+
+    color: white;
+
+    text-shadow:
+        0 2px 10px rgba(0,0,0,0.9);
+
+    transition: .5s ease;
+}
+
+.photo-message span {
+    display: block;
+    font-size: 28px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.photo-message p {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #ffe5ef;
+}
+
+/* ================= PHOTO NUMBER ================= */
+
+.photo-number {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+
+    padding: 8px 15px;
+
+    background: rgba(0,0,0,.35);
+    backdrop-filter: blur(5px);
+
+    border-radius: 30px;
+
+    font-size: 14px;
+}
+
+/* ================= MESSAGE ================= */
+
+.message-box {
+    max-width: 750px;
+    margin: auto;
+    padding: 45px 35px;
+    border-radius: 30px;
+
+    background: rgba(255,255,255,.1);
+
+    backdrop-filter: blur(15px);
+
+    border: 1px solid rgba(255,255,255,.2);
+
+    box-shadow: 0 20px 60px rgba(0,0,0,.3);
+
+    text-align: center;
+}
+
+.typing {
+    min-height: 260px;
+    font-size: 20px;
+    line-height: 2;
+    color: #ffeaf4;
+}
+
+/* ================= LETTER ================= */
+
+.letter-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.letter {
+    max-width: 700px;
+    width: 100%;
+
+    background: #fff5f8;
+    color: #63123c;
+
+    padding: 50px 40px;
+
+    border-radius: 10px;
+
+    box-shadow: 0 25px 80px rgba(0,0,0,.5);
+
+    transform: rotate(-1deg);
+}
+
+.letter h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #c2185b;
+}
+
+.letter p {
+    font-size: 18px;
+    line-height: 2;
+}
+
+.signature {
+    text-align: right;
+    margin-top: 30px;
+    font-family: cursive;
+    font-size: 25px;
+}
+
+/* ================= SURPRISE ================= */
+
+.surprise {
+    text-align: center;
+}
+
+.surprise-btn {
+    border: none;
+
+    background:
+        linear-gradient(135deg, #ff4081, #c2185b);
+
+    color: white;
+
+    padding: 18px 40px;
+
+    font-size: 18px;
+    font-weight: bold;
+
+    border-radius: 50px;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 10px 30px rgba(255,0,100,.3);
+
+    transition: .3s;
+}
+
+.surprise-btn:hover {
+    transform: scale(1.1);
+}
+
+#finalMessage {
+    display: none;
+    margin-top: 40px;
+    animation: pop .8s ease;
+}
+
+#finalMessage h2 {
+    font-size: clamp(35px, 8vw, 70px);
+
+    color: #ffd1e5;
+
+    text-shadow:
+        0 0 30px #ff3e8b;
+}
+
+#finalMessage p {
+    margin-top: 20px;
+    font-size: 20px;
+}
+
+@keyframes pop {
+
+    0% {
+        transform: scale(.5);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* ================= FOOTER ================= */
+
+footer {
+    text-align: center;
+    padding: 30px;
+
+    position: relative;
+    z-index: 5;
+
+    color: #ffc6dc;
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width:600px) {
+
+    .music-btn {
+        top: 12px;
+        right: 12px;
+        padding: 9px 13px;
+    }
+
+    .hero-description {
+        font-size: 16px;
+    }
+
+    .main-photo {
+        height: 400px;
+    }
+
+    .photo-message {
+        padding: 20px 12px;
+    }
+
+    .photo-message span {
+        font-size: 20px;
+    }
+
+    .photo-message p {
+        font-size: 14px;
+    }
+
+    .message-box {
+        padding: 30px 20px;
+    }
+
+    .typing {
+        font-size: 17px;
+    }
+
+    .letter {
+        padding: 35px 25px;
+    }
+
+    .letter p {
+        font-size: 16px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= MUSIC ================= -->
+
+<audio id="music" loop>
+    <source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<button class="music-btn"
+        onclick="toggleMusic()"
+        id="musicButton">
+
+    🎵 Play Music
+
+</button>
+
+
+<!-- ================= HERO ================= -->
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <div class="small-text">
+            TODAY IS A VERY SPECIAL DAY 27 AUG✨
+        </div>
+
+        <h1>
+            Happy Birthday
+        </h1>
+
+        <div class="name">
+            Kritika 'ser querido'  ❤️
+        </div>
+
+        <p class="hero-description">
+
+            To the person who makes ordinary moments feel
+            extraordinary and brings a little more happiness
+            into my world...❤️✨
+
+        </p>
+
+        <a href="#photos" class="scroll-btn">
+
+            💕 Begin Your Surprise
+
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- ================= 10 PHOTOS ================= -->
+
+<section id="photos">
+
+    <h2 class="section-title">
+
+        📸 Some Memories Never Fade
+
+    </h2>
+
+
+    <div class="gallery">
+
+        <div class="photo-container">
+
+
+            <!-- PHOTO -->
+
+            <img
+                id="slideshow"
+                src="photo1.jpg"
+                class="main-photo"
+                alt="Beautiful memory"
+            >
+
+
+            <!-- PHOTO NUMBER -->
+
+            <div class="photo-number"
+                 id="photoNumber">
+
+                Photo 1 / 10
+
+            </div>
+
+
+            <!-- DIFFERENT MESSAGE FOR EACH PHOTO -->
+
+            <div class="photo-message">
+
+                <span id="photoTitle">
+
+                    This moments is very special for me ❤️
+
+                </span>
+
+
+                <p id="photoText">
+
+                    Some memories are simply impossible to forget..🥺✨❤️.
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= BIRTHDAY MESSAGE ================= -->
+
+<section>
+
+    <h2 class="section-title">
+
+        💌 A Little Birthday Message
+
+    </h2>
+
+
+    <div class="message-box">
+
+        <div class="typing"
+             id="typingText">
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= LETTER ================= -->
+
+<section class="letter-section">
+
+    <div class="letter">
+
+        <h2>
+            🌹 A Letter For You
+        </h2>
+
+
+        <p>
+
+            Dear My Special Person,
+
+            <br><br>
+
+            On your birthday, I just want you to know how
+            incredibly special you are.
+
+            <br><br>
+
+            Some people enter our lives and quietly make
+            everything a little brighter. You are one of those
+            people.
+
+            <br><br>
+
+            I hope this new year of your life brings you
+            countless reasons to smile, dreams that come true,
+            beautiful memories, and all the happiness you
+            deserve.
+
+            <br><br>
+
+            Happy Birthday. ❤️
+
+        </p>
+
+
+        <div class="signature">
+
+            With lots of love,<br>
+
+            Someone who cares about you ❤️
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= FINAL SURPRISE ================= -->
+
+<section class="surprise">
+
+    <h2 class="section-title">
+
+        🎁 One Last Surprise
+
+    </h2>
+
+
+    <button class="surprise-btn"
+            onclick="showSurprise()">
+
+        💖 Open Your Surprise
+
+    </button>
+
+
+    <div id="finalMessage">
+
+        <h2>
+
+            I Love Seeing You Smile ❤️
+
+        </h2>
+
+
+        <p>
+
+            May your birthday be as beautiful,
+            wonderful and unforgettable as you are. ✨
+
+        </p>
+
+
+        <p style="font-size:45px; margin-top:25px;">
+
+            🎂 🎉 💕 🌹 ✨
+
+        </p>
+
+    </div>
+
+</section>
+
+
+<footer>
+
+    Made with ❤️ specially for you
+
+</footer>
+
+
+<script>
+
+/* =====================================================
+   MUSIC
+===================================================== */
+
+const music =
+    document.getElementById("music");
+
+const musicButton =
+    document.getElementById("musicButton");
+
+
+function toggleMusic() {
+
+    if (music.paused) {
+
+        music.play();
+
+        musicButton.innerHTML =
+            "🔊 Music On";
+
+    }
+
+    else {
+
+        music.pause();
+
+        musicButton.innerHTML =
+            "🎵 Play Music";
+
+    }
+
+}
+
+
+/* =====================================================
+   10 PHOTOS
+===================================================== */
+
+const photos = [
+
+    "photo1.jpg",
+    "photo2.jpg",
+    "photo3.jpg",
+    "photo4.jpg",
+    "photo5.jpg",
+    "photo6.jpg",
+    "photo7.jpg",
+    "photo8.jpg",
+    "photo9.jpg",
+    "photo10.jpg"
+
+];
+
+
+/* =====================================================
+   MESSAGE FOR EACH PHOTO
+===================================================== */
+
+const photoTitles = [
+
+    "This moments is very special for me ❤️",
+
+    "AUG 2025 Give Me Something Special 💕",
+
+    "Nothing And Nobody Can Replace U🌹✨💕",
+
+    "Some moments are simply unforgettable ✨",
+
+    "Your smile makes everything beautiful 💕 ❤️",
+
+    "I Wish you HAPPY like this Exectly 🌸❤️ 📸",
+
+    "This is the only good Picture I have With U ❤️",
+
+    "Another beautiful memory with you 💕",
+
+    "You make ordinary days feel extraordinary 🌸",
+
+    "Byyy...🥺😔🥺❤️"
+
+];
+
+
+/* =====================================================
+   SMALL MESSAGE FOR EACH PHOTO
+===================================================== */
+
+const photoTexts = [
+
+    "Some memories are simply impossible to forget.",
+
+    "jasa ki tu ✨🌸.",
+
+    "This moment will always have a special place in my heart✨💕.",
+
+    "Every time I spend with u is special🌹✨💕.",
+
+    "Never stop smiling that beautiful smile..",
+
+    "Your smile makes everything beautiful 💕.",
+
+    "If I could save moments forever, I would save this one.😔.",
+
+    "There are moments that words can never describe.",
+
+    "But Now its End 🥺😔🥺✨.",
+
+    "Happy Birthday to someone truly unforgettable. ❤️"
+
+];
+
+
+/* =====================================================
+   SLIDESHOW
+===================================================== */
+
+let currentPhoto = 0;
+
+
+setInterval(() => {
+
+
+    const image =
+        document.getElementById("slideshow");
+
+
+    const title =
+        document.getElementById("photoTitle");
+
+
+    const text =
+        document.getElementById("photoText");
+
+
+    const number =
+        document.getElementById("photoNumber");
+
+
+    /* Fade out */
+
+    image.style.opacity = "0";
+
+
+    setTimeout(() => {
+
+
+        /* Move to next photo */
+
+        currentPhoto++;
+
+
+        /* Start again after photo 10 */
+
+        if (currentPhoto >= photos.length) {
+
+            currentPhoto = 0;
+
+        }
+
+
+        /* Change photo */
+
+        image.src =
+            photos[currentPhoto];
+
+
+        /* Change big transparent message */
+
+        title.innerHTML =
+            photoTitles[currentPhoto];
+
+
+        /* Change small transparent message */
+
+        text.innerHTML =
+            photoTexts[currentPhoto];
+
+
+        /* Change photo number */
+
+        number.innerHTML =
+            "Photo " +
+            (currentPhoto + 1) +
+            " / 10";
+
+
+        /* Fade in */
+
+        image.style.opacity = "1";
+
+
+    }, 700);
+
+
+}, 5000);
+
+
+/* =====================================================
+   TYPING MESSAGE
+===================================================== */
+
+const message = `
+
+Happy Birthday to someone truly special. ❤️
+
+You deserve beautiful moments, genuine happiness,
+endless laughter and every wonderful thing life
+has to offer.
+
+Thank you for simply being you.
+
+Keep smiling.
+
+Keep shining.
+
+And never forget how special you are. 💕
+
+`;
+
+
+let index = 0;
+
+
+function typeMessage() {
+
+
+    if (index < message.length) {
+
+
+        document.getElementById("typingText").innerHTML +=
+
+            message.charAt(index) === "\n"
+
+            ? "<br>"
+
+            : message.charAt(index);
+
+
+        index++;
+
+
+        setTimeout(
+            typeMessage,
+            35
+        );
+
+    }
+
+}
+
+
+setTimeout(
+    typeMessage,
+    1000
+);
+
+
+/* =====================================================
+   FINAL SURPRISE
+===================================================== */
+
+function showSurprise() {
+
+
+    document.getElementById(
+        "finalMessage"
+    ).style.display = "block";
+
+
+    createHearts();
+
+    createConfetti();
+
+
+    window.scrollTo({
+
+        top: document.body.scrollHeight,
+
+        behavior: "smooth"
+
+    });
+
+}
+
+
+/* =====================================================
+   FLOATING HEARTS
+===================================================== */
+
+function createHearts() {
+
+
+    for (
+        let i = 0;
+        i < 35;
+        i++
+    ) {
+
+
+        const heart =
+            document.createElement("div");
+
+
+        heart.className =
+            "bg-heart";
+
+
+        const hearts = [
+
+            "❤️",
+            "💕",
+            "💖",
+            "💗",
+            "💓",
+            "🌹"
+
+        ];
+
+
+        heart.innerHTML =
+            hearts[
+                Math.floor(
+                    Math.random() *
+                    hearts.length
+                )
+            ];
+
+
+        heart.style.left =
+            Math.random() *
+            100 +
+            "vw";
+
+
+        heart.style.fontSize =
+            (15 +
+            Math.random() * 30) +
+            "px";
+
+
+        heart.style.animationDuration =
+            (3 +
+            Math.random() * 5) +
+            "s";
+
+
+        document.body.appendChild(
+            heart
+        );
+
+
+        setTimeout(() => {
+
+            heart.remove();
+
+        }, 8000);
+
+    }
+
+}
+
+
+/* =====================================================
+   CONFETTI
+===================================================== */
+
+function createConfetti() {
+
+
+    const colors = [
+
+        "#ff4081",
+        "#ffd700",
+        "#ffffff",
+        "#ff80ab",
+        "#ba68c8"
+
+    ];
+
+
+    for (
+        let i = 0;
+        i < 100;
+        i++
+    ) {
+
+
+        const confetti =
+            document.createElement("div");
+
+
+        confetti.style.position =
+            "fixed";
+
+
+        confetti.style.width =
+            "8px";
+
+
+        confetti.style.height =
+            "8px";
+
+
+        confetti.style.background =
+            colors[
+                Math.floor(
+                    Math.random() *
+                    colors.length
+                )
+            ];
+
+
+        confetti.style.left =
+            Math.random() *
+            100 +
+            "vw";
+
+
+        confetti.style.top =
+            "-10px";
+
+
+        confetti.style.zIndex =
+            "999";
+
+
+        confetti.style.borderRadius =
+            "50%";
+
+
+        const duration =
+            2 +
+            Math.random() * 4;
+
+
+        confetti.animate(
+
+            [
+
+                {
+                    transform:
+                        "translateY(0) rotate(0deg)"
+                },
+
+                {
+
+                    transform:
+                        `translateY(110vh) rotate(${Math.random() * 1000}deg)`
+
+                }
+
+            ],
+
+            {
+
+                duration:
+                    duration * 1000,
+
+                easing:
+                    "linear"
+
+            }
+
+        );
+
+
+        document.body.appendChild(
+            confetti
+        );
+
+
+        setTimeout(() => {
+
+            confetti.remove();
+
+        }, duration * 1000);
+
+    }
+
+}
+
+
+/* =====================================================
+   INITIAL HEARTS
+===================================================== */
+
+for (
+    let i = 0;
+    i < 15;
+    i++
+) {
+
+
+    const heart =
+        document.createElement("div");
+
+
+    heart.className =
+        "bg-heart";
+
+
+    heart.innerHTML =
+        "❤️";
+
+
+    heart.style.left =
+        Math.random() *
+        100 +
+        "vw";
+
+
+    heart.style.fontSize =
+        (15 +
+        Math.random() * 25) +
+        "px";
+
+
+    heart.style.animationDuration =
+        (5 +
+        Math.random() * 6) +
+        "s";
+
+
+    document.body.appendChild(
+        heart
+    );
+
+}
+
+</script>
+
+</body>
+</html>
+```
+
+Made for U ❤️✨
+
