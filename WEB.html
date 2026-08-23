@@ -2211,7 +2211,7 @@ html.pro-low-power .v2-cursor-light {
 
         <!-- VIDEO 1 -->
         <div class="video-card">
-            <video controls playsinline preload="metadata" data-video-src="video1.mp4">
+            <video controls playsinline preload="metadata">
                 <source src="video1.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
@@ -2227,7 +2227,7 @@ html.pro-low-power .v2-cursor-light {
 
         <!-- VIDEO 2 -->
         <div class="video-card">
-            <video controls playsinline preload="metadata" data-video-src="video2.mp4">
+            <video controls playsinline preload="metadata">
                 <source src="video2.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
@@ -2951,55 +2951,6 @@ addEventListener("resize", updateLetterHint, { passive: true });
     </div>
 </div>
 <button id="topBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
-<script>
-/* =========================================================
-   RELIABLE + MOBILE-FRIENDLY VIDEO LOADING
-   ========================================================= */
-(() => {
-  const videos = document.querySelectorAll("video[data-video-src]");
-  if (!videos.length) return;
-
-  const loadVideo = (video) => {
-    if (video.dataset.loaded === "1") return;
-
-    const src = video.dataset.videoSrc;
-    if (!src) return;
-
-    const source = video.querySelector("source");
-    if (source && !source.getAttribute("src")) source.src = src;
-    if (!video.getAttribute("src")) video.src = src;
-
-    video.preload = "metadata";
-    video.dataset.loaded = "1";
-
-    /* Tell the browser the media source changed. */
-    try { video.load(); } catch (_) {}
-  };
-
-  /* Load when the video is close to the viewport, not on page startup. */
-  if ("IntersectionObserver" in window) {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          loadVideo(entry.target);
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { rootMargin: "500px 0px", threshold: 0.01 });
-
-    videos.forEach(video => observer.observe(video));
-  } else {
-    videos.forEach(loadVideo);
-  }
-
-  /* Fallback for direct taps/clicks, especially on mobile browsers. */
-  videos.forEach(video => {
-    video.addEventListener("pointerdown", () => loadVideo(video), { passive: true });
-    video.addEventListener("touchstart", () => loadVideo(video), { passive: true });
-    video.addEventListener("focus", () => loadVideo(video), { passive: true });
-  });
-})();
-</script>
-
+    
 </body>
 </html>
