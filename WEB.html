@@ -1623,6 +1623,43 @@ body::after{
   }
 }
 
+
+/* =========================================================
+   PERFORMANCE OPTIMIZATION — VISUALS/BEHAVIOR PRESERVED
+   ========================================================= */
+
+/* Let the browser skip painting sections that are far off-screen.
+   Each section already has a 100vh minimum, so the reserved size
+   matches the existing layout. */
+section {
+    content-visibility: auto;
+    contain-intrinsic-size: 100vh;
+}
+
+/* Decode images off the main rendering path where supported. */
+.main-photo {
+    decoding: async;
+}
+
+/* Keep compositor-heavy animated elements on their own layer only
+   while they are actually animated. */
+.main-photo,
+.ambient-orb,
+#cinematicIntro,
+#finalScene,
+.v2-cursor-light {
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+}
+
+/* Prevent accidental text selection/paint work on decorative layers. */
+.ambient-orb,
+.v2-cursor-light,
+.bg-heart,
+#scrollProgress {
+    contain: layout style paint;
+}
+
 </style>
 </head>
 
@@ -1723,6 +1760,7 @@ body::after{
                 src="photo1.jpg"
                 class="main-photo"
                 alt="Beautiful memory"
+                decoding="async"
             >
 
 
@@ -2164,93 +2202,53 @@ const photoTexts = [
 
 let currentPhoto = 0;
 
+const slideshowImage = document.getElementById("slideshow");
+const photoTitleEl = document.getElementById("photoTitle");
+const photoTextEl = document.getElementById("photoText");
+const photoNumberEl = document.getElementById("photoNumber");
+
+function preloadNextPhoto() {
+    const nextIndex = (currentPhoto + 1) % photos.length;
+    const preload = new Image();
+    preload.decoding = "async";
+    preload.src = photos[nextIndex];
+}
 
 setInterval(() => {
+    if (!slideshowImage) return;
 
-
-    const image =
-        document.getElementById("slideshow");
-
-
-    const title =
-        document.getElementById("photoTitle");
-
-
-    const text =
-        document.getElementById("photoText");
-
-
-    const number =
-        document.getElementById("photoNumber");
-
-
-    /* Fade out */
-
-    image.style.opacity = "0";
-
+    slideshowImage.style.opacity = "0";
 
     setTimeout(() => {
+        currentPhoto = (currentPhoto + 1) % photos.length;
 
+        slideshowImage.style.transform = "scale(1.025)";
+        slideshowImage.style.filter = "saturate(.88) contrast(1.08)";
+        slideshowImage.src = photos[currentPhoto];
 
-        /* Move to next photo */
-
-        currentPhoto++;
-
-
-        /* Start again after photo 10 */
-
-        if (currentPhoto >= photos.length) {
-
-            currentPhoto = 0;
-
-        }
-
-
-        /* Change photo */
-
-        image.style.transform = "scale(1.025)";
-        image.style.filter = "saturate(.88) contrast(1.08)";
-
-        image.src =
-            photos[currentPhoto];
-
-        image.onload = () => {
+        slideshowImage.onload = () => {
             requestAnimationFrame(() => {
-                image.style.transform = "scale(1)";
-                image.style.filter = "saturate(.94) contrast(1.04)";
+                slideshowImage.style.transform = "scale(1)";
+                slideshowImage.style.filter = "saturate(.94) contrast(1.04)";
             });
         };
 
+        photoTitleEl.textContent = photoTitles[currentPhoto];
+        photoTextEl.textContent = photoTexts[currentPhoto];
+        photoNumberEl.textContent = `Photo ${currentPhoto + 1} / 10`;
 
-        /* Change big transparent message */
+        slideshowImage.style.opacity = "1";
 
-        title.innerHTML =
-            photoTitles[currentPhoto];
-
-
-        /* Change small transparent message */
-
-        text.innerHTML =
-            photoTexts[currentPhoto];
-
-
-        /* Change photo number */
-
-        number.innerHTML =
-            "Photo " +
-            (currentPhoto + 1) +
-            " / 10";
-
-
-        /* Fade in */
-
-        image.style.opacity = "1";
-
-
+        /* Warm the next image without loading all 10 at once. */
+        if ("requestIdleCallback" in window) {
+            requestIdleCallback(preloadNextPhoto, { timeout: 1200 });
+        } else {
+            setTimeout(preloadNextPhoto, 100);
+        }
     }, 700);
-
-
 }, 5000);
+
+preloadNextPhoto();
 
 
 /* =====================================================
@@ -2279,20 +2277,15 @@ And never forget how special you are. 💕
 let index = 0;
 
 
+const typingText = document.getElementById("typingText");
+
 function typeMessage() {
-
-
     if (index < message.length) {
-
-
-        document.getElementById("typingText").innerHTML +=
-
-            message.charAt(index) === "\n"
-
-            ? "<br>"
-
-            : message.charAt(index);
-
+        if (message.charAt(index) === "\n") {
+            typingText.insertAdjacentHTML("beforeend", "<br>");
+        } else {
+            typingText.insertAdjacentText("beforeend", message.charAt(index));
+        }
 
         index++;
 
@@ -2621,8 +2614,37 @@ function updateCinematicUI() {
     const topBtn = document.getElementById("topBtn");
     if (topBtn) topBtn.classList.toggle("show", scrollTop > 650);
 }
-window.addEventListener("scroll", updateCinematicUI, {passive:true});
-updateCinematicUI();
+let scrollTicking = false;
+
+function updateCinematicFrame() {
+    const scrollTop = window.scrollY;
+    const doc = document.documentElement;
+    const maxScroll = doc.scrollHeight - window.innerHeight;
+    const progress = maxScroll > 0 ? (scrollTop / maxScroll) * 100 : 0;
+
+    const bar = document.getElementById("scrollProgress");
+    if (bar) bar.style.width = progress + "%";
+
+    const topBtn = document.getElementById("topBtn");
+    if (topBtn) topBtn.classList.toggle("show", scrollTop > 650);
+
+    const hero = document.querySelector(".hero-content");
+    if (hero && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        hero.style.transform = `translateY(${Math.min(scrollTop * .12, 55)}px)`;
+        hero.style.opacity = String(Math.max(.35, 1 - scrollTop / 750));
+    }
+
+    scrollTicking = false;
+}
+
+function requestCinematicFrame() {
+    if (scrollTicking) return;
+    scrollTicking = true;
+    requestAnimationFrame(updateCinematicFrame);
+}
+
+window.addEventListener("scroll", requestCinematicFrame, {passive:true});
+updateCinematicFrame();
 
 /* Birthday countdown — next 27 August */
 function updateBirthdayCountdown() {
@@ -2735,37 +2757,64 @@ window.addEventListener("resize", updateLetterHint);
     light.className = "v2-cursor-light";
     document.body.appendChild(light);
 
+    let pointerX = innerWidth / 2;
+    let pointerY = innerHeight / 2;
+    let pointerTicking = false;
+
     addEventListener("pointermove", e => {
-      light.style.left = e.clientX + "px";
-      light.style.top = e.clientY + "px";
-      document.documentElement.style.setProperty("--v2-mx", `${e.clientX/innerWidth*100}%`);
-      document.documentElement.style.setProperty("--v2-my", `${e.clientY/innerHeight*100}%`);
+      pointerX = e.clientX;
+      pointerY = e.clientY;
+
+      if (pointerTicking) return;
+      pointerTicking = true;
+
+      requestAnimationFrame(() => {
+        light.style.left = pointerX + "px";
+        light.style.top = pointerY + "px";
+        document.documentElement.style.setProperty("--v2-mx", `${pointerX/innerWidth*100}%`);
+        document.documentElement.style.setProperty("--v2-my", `${pointerY/innerHeight*100}%`);
+        pointerTicking = false;
+      });
     }, {passive:true});
   }
 
   /* Desktop 3D card tilt */
   if (!reduce && matchMedia("(pointer:fine) and (min-width:801px)").matches) {
     document.querySelectorAll(".reason-card,.memory-card,.video-card,.count-box").forEach(card => {
+      let rect = null;
+      let pointerX = 0;
+      let pointerY = 0;
+      let tiltTicking = false;
+
+      card.addEventListener("pointerenter", () => {
+        rect = card.getBoundingClientRect();
+      }, {passive:true});
+
       card.addEventListener("pointermove", e => {
-        const r = card.getBoundingClientRect();
-        const rx = ((e.clientY-r.top)/r.height-.5)*-4;
-        const ry = ((e.clientX-r.left)/r.width-.5)*4;
-        card.style.transform =
-          `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-7px) scale(1.015)`;
+        pointerX = e.clientX;
+        pointerY = e.clientY;
+
+        if (!rect) rect = card.getBoundingClientRect();
+        if (tiltTicking) return;
+        tiltTicking = true;
+
+        requestAnimationFrame(() => {
+          const rx = ((pointerY - rect.top) / rect.height - .5) * -4;
+          const ry = ((pointerX - rect.left) / rect.width - .5) * 4;
+          card.style.transform =
+            `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-7px) scale(1.015)`;
+          tiltTicking = false;
+        });
+      }, {passive:true});
+
+      card.addEventListener("pointerleave", () => {
+        rect = null;
+        card.style.transform = "";
       });
-      card.addEventListener("pointerleave", () => card.style.transform = "");
     });
   }
 
-  /* Gentle hero parallax */
-  const hero = document.querySelector(".hero-content");
-  if (!reduce && hero) {
-    addEventListener("scroll", () => {
-      const y = scrollY;
-      hero.style.transform = `translateY(${Math.min(y*.12,55)}px)`;
-      hero.style.opacity = String(Math.max(.35,1-y/750));
-    }, {passive:true});
-  }
+  /* Hero parallax is handled by the shared rAF scroll loop above. */
 })();
 
 </script>
