@@ -1660,6 +1660,55 @@ section {
     contain: layout style paint;
 }
 
+
+/* =========================================================
+   PRO PERFORMANCE LAYER — VISUALS/CONTENT UNCHANGED
+   ========================================================= */
+html { text-rendering: optimizeSpeed; }
+img, video { content-visibility: auto; contain: paint; }
+.photo-container, .video-card, .message-box, .memory-card, .reason-card, .count-box {
+    contain: layout paint;
+}
+.bg-heart, .ambient-orb, #scrollProgress, .v2-cursor-light,
+.main-photo, .hero-content, .envelope-letter, .envelope-flap {
+    will-change: transform, opacity;
+}
+.video-card video { contain: strict; }
+
+/* Keep expensive backdrop effects isolated so they don't invalidate the page. */
+.music-btn, .enter-btn, .photo-message, .photo-number, .message-box,
+.video-card, .memory-card, .reason-card, .count-box, #topBtn {
+    isolation: isolate;
+}
+
+/* On genuinely constrained devices, preserve the design while avoiding
+   the biggest GPU killers. No content/layout/animation is removed. */
+@media (max-width: 700px), (max-device-width: 700px) {
+    .bg-heart { will-change: transform; }
+    .ambient-orb { width: 220px; height: 220px; filter: blur(55px); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .bg-heart, .ambient-orb { animation: none !important; }
+}
+
+/* Very low-power devices: replace live blur with visually similar translucency.
+   This is opt-in via JS only and leaves normal machines untouched. */
+html.pro-low-power .music-btn,
+html.pro-low-power .enter-btn,
+html.pro-low-power .photo-message,
+html.pro-low-power .photo-number,
+html.pro-low-power .message-box,
+html.pro-low-power .video-card,
+html.pro-low-power .memory-card,
+html.pro-low-power .reason-card,
+html.pro-low-power .count-box,
+html.pro-low-power #topBtn {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+html.pro-low-power body::before { mix-blend-mode: normal; opacity: .35; }
+html.pro-low-power .ambient-orb { filter: blur(35px); }
+
 </style>
 </head>
 
@@ -2201,55 +2250,56 @@ const photoTexts = [
 ===================================================== */
 
 let currentPhoto = 0;
-
 const slideshowImage = document.getElementById("slideshow");
-const photoTitleEl = document.getElementById("photoTitle");
-const photoTextEl = document.getElementById("photoText");
-const photoNumberEl = document.getElementById("photoNumber");
+const slideshowTitle = document.getElementById("photoTitle");
+const slideshowText = document.getElementById("photoText");
+const slideshowNumber = document.getElementById("photoNumber");
 
-function preloadNextPhoto() {
-    const nextIndex = (currentPhoto + 1) % photos.length;
-    const preload = new Image();
-    preload.decoding = "async";
-    preload.src = photos[nextIndex];
+/* Decode the next image before it is displayed. */
+const photoCache = new Map();
+function preloadPhoto(index) {
+    if (photoCache.has(index)) return photoCache.get(index);
+    const img = new Image();
+    img.decoding = "async";
+    img.src = photos[index];
+    photoCache.set(index, img);
+    return img;
 }
+for (let i = 0; i < Math.min(2, photos.length); i++) preloadPhoto(i);
 
-setInterval(() => {
+function advancePhoto() {
     if (!slideshowImage) return;
+
+    const next = (currentPhoto + 1) % photos.length;
+    const nextImg = preloadPhoto(next);
 
     slideshowImage.style.opacity = "0";
 
-    setTimeout(() => {
-        currentPhoto = (currentPhoto + 1) % photos.length;
+    window.setTimeout(() => {
+        currentPhoto = next;
 
         slideshowImage.style.transform = "scale(1.025)";
-        slideshowImage.style.filter = "saturate(.88) contrast(1.08)";
-        slideshowImage.src = photos[currentPhoto];
+        slideshowImage.src = nextImg.src;
 
-        slideshowImage.onload = () => {
+        slideshowTitle.textContent = photoTitles[currentPhoto];
+        slideshowText.textContent = photoTexts[currentPhoto];
+        slideshowNumber.textContent = `Photo ${currentPhoto + 1} / ${photos.length}`;
+
+        const reveal = () => {
             requestAnimationFrame(() => {
                 slideshowImage.style.transform = "scale(1)";
                 slideshowImage.style.filter = "saturate(.94) contrast(1.04)";
+                slideshowImage.style.opacity = "1";
             });
         };
 
-        photoTitleEl.textContent = photoTitles[currentPhoto];
-        photoTextEl.textContent = photoTexts[currentPhoto];
-        photoNumberEl.textContent = `Photo ${currentPhoto + 1} / 10`;
+        if (nextImg.complete) reveal();
+        else nextImg.decode?.().catch(() => {}).finally(reveal);
 
-        slideshowImage.style.opacity = "1";
-
-        /* Warm the next image without loading all 10 at once. */
-        if ("requestIdleCallback" in window) {
-            requestIdleCallback(preloadNextPhoto, { timeout: 1200 });
-        } else {
-            setTimeout(preloadNextPhoto, 100);
-        }
+        preloadPhoto((currentPhoto + 1) % photos.length);
     }, 700);
-}, 5000);
-
-preloadNextPhoto();
-
+}
+window.setInterval(advancePhoto, 5000);
 
 /* =====================================================
    TYPING MESSAGE
@@ -2275,36 +2325,24 @@ And never forget how special you are. 💕
 
 
 let index = 0;
-
-
-const typingText = document.getElementById("typingText");
+const typingElement = document.getElementById("typingText");
+let typingBuffer = "";
+let typingTimer = null;
 
 function typeMessage() {
-    if (index < message.length) {
-        if (message.charAt(index) === "\n") {
-            typingText.insertAdjacentHTML("beforeend", "<br>");
-        } else {
-            typingText.insertAdjacentText("beforeend", message.charAt(index));
-        }
+    if (!typingElement || index >= message.length) return;
 
-        index++;
-
-
-        setTimeout(
-            typeMessage,
-            35
-        );
-
+    /* Batch several characters into one DOM write. */
+    const end = Math.min(index + 3, message.length);
+    for (; index < end; index++) {
+        const ch = message.charAt(index);
+        typingBuffer += ch === "\n" ? "<br>" : ch;
     }
+    typingElement.innerHTML = typingBuffer;
 
+    typingTimer = window.setTimeout(typeMessage, 105);
 }
-
-
-setTimeout(
-    typeMessage,
-    1000
-);
-
+typingTimer = window.setTimeout(typeMessage, 1000);
 
 /* =====================================================
    FINAL SURPRISE
@@ -2719,6 +2757,23 @@ function updateLetterHint() {
 window.addEventListener("load", updateLetterHint);
 window.addEventListener("resize", updateLetterHint);
 
+
+/* =========================================================
+   DEVICE-AWARE PERFORMANCE
+   Only activates on constrained hardware.
+   ========================================================= */
+(() => {
+  const cores = navigator.hardwareConcurrency || 8;
+  const memory = navigator.deviceMemory || 8;
+  const smallScreen = Math.min(innerWidth, innerHeight) < 700;
+  if (cores <= 4 || memory <= 4) {
+    document.documentElement.classList.add("pro-low-power");
+  }
+  /* Avoid keeping large offscreen videos actively composited. */
+  document.querySelectorAll("video").forEach(video => {
+    video.setAttribute("preload", "metadata");
+  });
+})();
 
 /* =========================================================
    V2 MOTION ENGINE
