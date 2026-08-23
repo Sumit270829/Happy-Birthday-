@@ -1824,7 +1824,168 @@ html.pro-low-power .v2-cursor-light {
     display: none !important;
 }
 
+
+
+/* =========================================================
+   ULTRA-LIGHT MOBILE MODE
+   Keeps the design, removes expensive GPU/paint work on phones.
+   ========================================================= */
+@media (max-width: 700px) {
+    html {
+        scroll-behavior: auto;
+        -webkit-text-size-adjust: 100%;
+    }
+
+    /* Film grain + blend-mode overlay is surprisingly expensive on phones. */
+    body::before {
+        display: none !important;
+    }
+
+    /* Large blurred fixed orbs force repeated GPU compositing. */
+    .ambient-orb {
+        display: none !important;
+    }
+
+    /* Keep hearts, but make them much cheaper. */
+    .bg-heart {
+        animation-duration: 9s !important;
+        opacity: .45;
+        will-change: transform;
+        text-shadow: none !important;
+        filter: none !important;
+    }
+
+    /* Remove backdrop blurs on mobile. The translucent backgrounds remain. */
+    .music-btn,
+    .photo-message,
+    .photo-number,
+    .message-box,
+    .video-card,
+    .memory-card,
+    .reason-card,
+    .count-box,
+    .envelope,
+    .envelope-letter {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+
+    /* Shadows are one of the largest paint costs in long pages. */
+    .photo-container,
+    .video-card,
+    .message-box,
+    .memory-card,
+    .reason-card,
+    .count-box,
+    .letter,
+    .envelope,
+    .music-btn {
+        box-shadow: 0 10px 28px rgba(0,0,0,.28) !important;
+    }
+
+    /* Avoid animated blur/filter interpolation on images/videos. */
+    .main-photo,
+    .video-card video {
+        filter: none !important;
+        transition: opacity .35s ease !important;
+    }
+
+    /* No continuous shine animation on mobile. */
+    .surprise-btn::before {
+        animation: none !important;
+        display: none !important;
+    }
+
+    /* Reveal elements instantly on mobile instead of animating dozens of nodes. */
+    .v2-reveal {
+        opacity: 1 !important;
+        transform: none !important;
+        filter: none !important;
+        transition: none !important;
+    }
+
+    /* Reduce costly full-page containment bookkeeping. */
+    section {
+        content-visibility: auto;
+        contain-intrinsic-size: auto 100vh;
+    }
+
+    /* Prevent oversized media from creating unnecessary raster work. */
+    .main-photo {
+        height: 400px;
+        object-position: center;
+    }
+
+    .video-card video {
+        height: 400px;
+    }
+}
+
 </style>
+
+<style id="mobile-animation-optimization">
+/* Lightweight mobile mode: preserve appearance, remove mostly-unnoticed motion */
+@media (max-width: 700px) {
+  /* Stop expensive continuous decorative motion */
+  body::after,
+  .ambient-orb,
+  .bg-heart {
+    animation: none !important;
+  }
+
+  .ambient-orb {
+    display: none !important;
+  }
+
+  /* Keep reveal, but use a cheap opacity transition instead of blur + movement */
+  .v2-reveal {
+    opacity: .96 !important;
+    transform: none !important;
+    filter: none !important;
+    transition: opacity .25s ease !important;
+  }
+
+  .v2-reveal.v2-visible {
+    opacity: 1 !important;
+  }
+
+  /* Avoid hover/transform effects that have little value on touch screens */
+  .reason-card:hover,
+  .memory-card:hover,
+  .video-card:hover,
+  .count-box:hover {
+    transform: none !important;
+  }
+
+  /* Remove costly glass blur on touch devices */
+  .music-btn,
+  .enter-btn,
+  .photo-message,
+  .photo-number,
+  .message-box,
+  .video-card,
+  .memory-card,
+  .reason-card,
+  .count-box,
+  #topBtn {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Make photo transition simple */
+  .main-photo {
+    filter: none !important;
+    transition: opacity .3s ease !important;
+  }
+
+  /* No need for decorative shine movement on mobile */
+  .music-btn::before,
+  .enter-btn::before {
+    animation: none !important;
+  }
+}
+</style>
+
 </head>
 
 <body>
@@ -2050,8 +2211,8 @@ html.pro-low-power .v2-cursor-light {
 
         <!-- VIDEO 1 -->
         <div class="video-card">
-            <video controls playsinline preload="metadata">
-                <source src="video1.mp4" type="video/mp4">
+            <video controls playsinline preload="none" loading="lazy" data-lazy-video>
+                <source data-src="video1.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
 
@@ -2066,8 +2227,8 @@ html.pro-low-power .v2-cursor-light {
 
         <!-- VIDEO 2 -->
         <div class="video-card">
-            <video controls playsinline preload="metadata">
-                <source src="video2.mp4" type="video/mp4">
+            <video controls playsinline preload="none" loading="lazy" data-lazy-video>
+                <source data-src="video2.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
 
@@ -2327,9 +2488,9 @@ function preloadPhoto(index) {
     return img;
 }
 
-/* Only keep a tiny rolling cache instead of loading all 10 images at once. */
+/* Mobile-first: load only the currently visible image. The next image is
+   fetched only when the slideshow section is actually on screen. */
 preloadPhoto(0);
-preloadPhoto(1);
 
 async function advancePhoto() {
     if (!slideshowImage || !slideshowVisible || document.hidden) return;
@@ -2357,8 +2518,8 @@ async function advancePhoto() {
         slideshowImage.style.opacity = "1";
     });
 
-    /* Preload only the next image. */
-    preloadPhoto((currentPhoto + 1) % photos.length);
+    /* Preload only the next image while the gallery is visible. */
+    if (slideshowVisible && !document.hidden) preloadPhoto((currentPhoto + 1) % photos.length);
 }
 
 function startSlideshow() {
@@ -2482,7 +2643,7 @@ function createConfetti(count = 55) {
 }
 
 /* Initial ambient hearts: fewer nodes = less continuous animation work. */
-createHearts(10);
+createHearts(matchMedia("(max-width:700px)").matches ? 4 : 10);
 
 /* =====================================================
    SURPRISE
@@ -2492,8 +2653,9 @@ function showSurprise() {
     const finalMessage = $("#finalMessage");
     if (finalMessage) finalMessage.style.display = "block";
 
-    createHearts(24);
-    createConfetti(55);
+    const mobile = matchMedia("(max-width:700px)").matches;
+    createHearts(mobile ? 6 : 24);
+    createConfetti(mobile ? 18 : 55);
 
     window.scrollTo({
         top: document.body.scrollHeight,
@@ -2623,8 +2785,9 @@ function openEnvelope() {
 function openFinalScene() {
     const finalScene = $("#finalScene");
     if (finalScene) finalScene.classList.add("show");
-    createHearts(24);
-    createConfetti(55);
+    const mobile = matchMedia("(max-width:700px)").matches;
+    createHearts(mobile ? 6 : 24);
+    createConfetti(mobile ? 18 : 55);
 }
 
 function closeFinalScene() {
@@ -2788,6 +2951,7 @@ addEventListener("resize", updateLetterHint, { passive: true });
     </div>
 </div>
 <button id="topBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
 
 </body>
 </html>
