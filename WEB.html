@@ -675,10 +675,12 @@ footer {
 
 /* Progress bar */
 #scrollProgress {
+    transform-origin: left center;
+    transform: scaleX(0);
     position: fixed;
     top: 0;
     left: 0;
-    width: 0%;
+    width: 100%;
     height: 2px;
     z-index: 10001;
     background: linear-gradient(90deg, #ff4f96, #ffd3e5, #c678ff);
@@ -1709,6 +1711,119 @@ html.pro-low-power #topBtn {
 html.pro-low-power body::before { mix-blend-mode: normal; opacity: .35; }
 html.pro-low-power .ambient-orb { filter: blur(35px); }
 
+
+/* =========================================================
+   OPTIMIZED PERFORMANCE LAYER
+   Keeps the design/content while reducing GPU + paint load.
+   ========================================================= */
+
+/* Avoid full-page repaint caused by continuously moving background. */
+body {
+    animation: none !important;
+    background-size: 100% 100% !important;
+}
+
+/* Film grain + blend mode can force expensive full-screen compositing. */
+body::before {
+    mix-blend-mode: normal !important;
+    opacity: .32 !important;
+}
+
+/* Keep ambient glow, but make it cheaper to paint. */
+body::after {
+    animation: none !important;
+    filter: blur(6px) !important;
+}
+.ambient-orb {
+    animation-duration: 28s !important;
+    filter: blur(55px) !important;
+}
+
+/* Backdrop blur is one of the biggest recurring GPU costs. */
+.music-btn,
+.enter-btn,
+.photo-message,
+.photo-number,
+.message-box,
+.video-card,
+.memory-card,
+.reason-card,
+.count-box {
+    -webkit-backdrop-filter: blur(10px) !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+/* Reveal animations: transform/opacity are much cheaper than animated blur. */
+.v2-reveal {
+    filter: none !important;
+    transition:
+        opacity .65s var(--v2-ease),
+        transform .65s var(--v2-ease) !important;
+}
+
+/* Don't keep every image/video permanently promoted to a GPU layer. */
+.main-photo,
+.hero-content,
+.envelope-letter,
+.envelope-flap {
+    will-change: auto !important;
+}
+
+/* These are actually animated, so keeping them promoted is useful. */
+.ambient-orb,
+#cinematicIntro,
+#finalScene,
+.v2-cursor-light {
+    will-change: transform, opacity;
+}
+
+/* Slightly cheaper image rendering. */
+img,
+video {
+    content-visibility: auto;
+}
+
+/* Mobile: reduce expensive visual effects further. */
+@media (max-width: 700px) {
+    body::before {
+        opacity: .24 !important;
+    }
+
+    .ambient-orb {
+        width: 180px !important;
+        height: 180px !important;
+        filter: blur(40px) !important;
+        animation-duration: 34s !important;
+    }
+
+    .music-btn,
+    .enter-btn,
+    .photo-message,
+    .photo-number,
+    .message-box,
+    .video-card,
+    .memory-card,
+    .reason-card,
+    .count-box {
+        -webkit-backdrop-filter: blur(6px) !important;
+        backdrop-filter: blur(6px) !important;
+    }
+}
+
+/* Lower motion automatically on constrained hardware. */
+html.pro-low-power .main-photo {
+    animation: none !important;
+}
+html.pro-low-power .envelope:not(.open) {
+    animation: none !important;
+}
+html.pro-low-power .ambient-orb {
+    animation: none !important;
+}
+html.pro-low-power .v2-cursor-light {
+    display: none !important;
+}
+
 </style>
 </head>
 
@@ -2132,181 +2247,147 @@ html.pro-low-power .ambient-orb { filter: blur(35px); }
 
 
 <script>
+/* =========================================================
+   OPTIMIZED JAVASCRIPT
+   Same features, fewer timers, DOM writes and paint-heavy updates.
+   ========================================================= */
 
-/* =====================================================
-   MUSIC
-===================================================== */
+const $ = (selector) => document.querySelector(selector);
+const $$ = (selector) => document.querySelectorAll(selector);
 
-const music =
-    document.getElementById("music");
-
-const musicButton =
-    document.getElementById("musicButton");
-
+const music = $("#music");
+const musicButton = $("#musicButton");
 
 function toggleMusic() {
-
+    if (!music) return;
     if (music.paused) {
-
-        music.play();
-
-        musicButton.innerHTML =
-            "🔊 Music On";
-
-    }
-
-    else {
-
+        music.play().then(() => {
+            if (musicButton) musicButton.textContent = "🔊 Music On";
+        }).catch(() => {});
+    } else {
         music.pause();
-
-        musicButton.innerHTML =
-            "🎵 Play Music";
-
+        if (musicButton) musicButton.textContent = "🎵 Play Music";
     }
-
 }
 
-
 /* =====================================================
-   10 PHOTOS
+   PHOTOS
 ===================================================== */
 
 const photos = [
-
-    "photo1.jpg",
-    "photo2.jpg",
-    "photo3.jpg",
-    "photo4.jpg",
-    "photo5.jpg",
-    "photo6.jpg",
-    "photo7.jpg",
-    "photo8.jpg",
-    "photo9.jpg",
-    "photo10.jpg"
-
+    "photo1.jpg","photo2.jpg","photo3.jpg","photo4.jpg","photo5.jpg",
+    "photo6.jpg","photo7.jpg","photo8.jpg","photo9.jpg","photo10.jpg"
 ];
-
-
-/* =====================================================
-   MESSAGE FOR EACH PHOTO
-===================================================== */
 
 const photoTitles = [
-
     "This moments is very special for me ❤️",
-
     "AUG 2025 Give Me Something Special 💕",
-
     "Nothing And Nobody Can Replace U🌹✨💕",
-
     "Some moments are simply unforgettable ✨",
-
     "Your smile makes everything beautiful 💕 ❤️",
-
     "I Wish you HAPPY like this Exectly 🌸❤️ 📸",
-
     "This is the only good Picture I have With U ❤️",
-
     "Another beautiful memory with you 💕",
-
     "You make ordinary days feel extraordinary 🌸",
-
     "Byyy...🥺😔🥺❤️"
-
 ];
-
-
-/* =====================================================
-   SMALL MESSAGE FOR EACH PHOTO
-===================================================== */
 
 const photoTexts = [
-
     "Some memories are simply impossible to forget.",
-
     "jasa ki tu ✨🌸.",
-
     "This moment will always have a special place in my heart✨💕.",
-
     "Every time I spend with u is special🌹✨💕.",
-
     "Never stop smiling that beautiful smile..",
-
     "Your smile makes everything beautiful 💕.",
-
     "If I could save moments forever, I would save this one.😔.",
-
     "There are moments that words can never describe.",
-
     "But Now its End 🥺😔🥺✨.",
-
     "Happy Birthday to someone truly unforgettable. ❤️"
-
 ];
 
-
-/* =====================================================
-   SLIDESHOW
-===================================================== */
-
 let currentPhoto = 0;
-const slideshowImage = document.getElementById("slideshow");
-const slideshowTitle = document.getElementById("photoTitle");
-const slideshowText = document.getElementById("photoText");
-const slideshowNumber = document.getElementById("photoNumber");
+let slideshowTimer = 0;
+let slideshowVisible = true;
 
-/* Decode the next image before it is displayed. */
+const slideshowImage = $("#slideshow");
+const slideshowTitle = $("#photoTitle");
+const slideshowText = $("#photoText");
+const slideshowNumber = $("#photoNumber");
+const photoSection = $("#photos");
+
 const photoCache = new Map();
+
 function preloadPhoto(index) {
     if (photoCache.has(index)) return photoCache.get(index);
+
     const img = new Image();
     img.decoding = "async";
     img.src = photos[index];
     photoCache.set(index, img);
     return img;
 }
-for (let i = 0; i < Math.min(2, photos.length); i++) preloadPhoto(i);
 
-function advancePhoto() {
-    if (!slideshowImage) return;
+/* Only keep a tiny rolling cache instead of loading all 10 images at once. */
+preloadPhoto(0);
+preloadPhoto(1);
+
+async function advancePhoto() {
+    if (!slideshowImage || !slideshowVisible || document.hidden) return;
 
     const next = (currentPhoto + 1) % photos.length;
     const nextImg = preloadPhoto(next);
 
     slideshowImage.style.opacity = "0";
 
-    window.setTimeout(() => {
-        currentPhoto = next;
+    try {
+        if (!nextImg.complete) await nextImg.decode?.();
+    } catch (_) {}
 
-        slideshowImage.style.transform = "scale(1.025)";
-        slideshowImage.src = nextImg.src;
+    currentPhoto = next;
+    slideshowImage.src = nextImg.src;
 
-        slideshowTitle.textContent = photoTitles[currentPhoto];
-        slideshowText.textContent = photoTexts[currentPhoto];
+    if (slideshowTitle) slideshowTitle.textContent = photoTitles[currentPhoto];
+    if (slideshowText) slideshowText.textContent = photoTexts[currentPhoto];
+    if (slideshowNumber) {
         slideshowNumber.textContent = `Photo ${currentPhoto + 1} / ${photos.length}`;
+    }
 
-        const reveal = () => {
-            requestAnimationFrame(() => {
-                slideshowImage.style.transform = "scale(1)";
-                slideshowImage.style.filter = "saturate(.94) contrast(1.04)";
-                slideshowImage.style.opacity = "1";
-            });
-        };
+    requestAnimationFrame(() => {
+        slideshowImage.style.transform = "scale(1)";
+        slideshowImage.style.opacity = "1";
+    });
 
-        if (nextImg.complete) reveal();
-        else nextImg.decode?.().catch(() => {}).finally(reveal);
-
-        preloadPhoto((currentPhoto + 1) % photos.length);
-    }, 700);
+    /* Preload only the next image. */
+    preloadPhoto((currentPhoto + 1) % photos.length);
 }
-window.setInterval(advancePhoto, 5000);
+
+function startSlideshow() {
+    if (!slideshowTimer) slideshowTimer = window.setInterval(advancePhoto, 5000);
+}
+
+function stopSlideshow() {
+    if (slideshowTimer) {
+        clearInterval(slideshowTimer);
+        slideshowTimer = 0;
+    }
+}
+
+if ("IntersectionObserver" in window && photoSection) {
+    const photoObserver = new IntersectionObserver(([entry]) => {
+        slideshowVisible = entry.isIntersecting;
+        if (slideshowVisible) startSlideshow();
+        else stopSlideshow();
+    }, { threshold: 0.05 });
+    photoObserver.observe(photoSection);
+} else {
+    startSlideshow();
+}
 
 /* =====================================================
    TYPING MESSAGE
 ===================================================== */
 
 const message = `
-
 Happy Birthday to someone truly special. ❤️
 
 You deserve beautiful moments, genuine happiness,
@@ -2320,356 +2401,158 @@ Keep smiling.
 Keep shining.
 
 And never forget how special you are. 💕
-
 `;
 
-
-let index = 0;
-const typingElement = document.getElementById("typingText");
+const typingElement = $("#typingText");
+let typingIndex = 0;
 let typingBuffer = "";
-let typingTimer = null;
+let typingTimer = 0;
 
 function typeMessage() {
-    if (!typingElement || index >= message.length) return;
+    if (!typingElement || typingIndex >= message.length) return;
 
-    /* Batch several characters into one DOM write. */
-    const end = Math.min(index + 3, message.length);
-    for (; index < end; index++) {
-        const ch = message.charAt(index);
+    /* One DOM write per frame instead of rebuilding the element repeatedly. */
+    const end = Math.min(typingIndex + 4, message.length);
+    while (typingIndex < end) {
+        const ch = message.charAt(typingIndex++);
         typingBuffer += ch === "\n" ? "<br>" : ch;
     }
-    typingElement.innerHTML = typingBuffer;
 
-    typingTimer = window.setTimeout(typeMessage, 105);
+    typingElement.innerHTML = typingBuffer;
+    typingTimer = setTimeout(typeMessage, 110);
 }
-typingTimer = window.setTimeout(typeMessage, 1000);
+typingTimer = setTimeout(typeMessage, 1000);
 
 /* =====================================================
-   FINAL SURPRISE
+   HEARTS + CONFETTI
+===================================================== */
+
+const heartSymbols = ["❤️","💕","💖","💗","💓","🌹"];
+
+function createHearts(count = 24) {
+    const fragment = document.createDocumentFragment();
+
+    for (let i = 0; i < count; i++) {
+        const heart = document.createElement("div");
+        heart.className = "bg-heart";
+        heart.textContent = heartSymbols[(Math.random() * heartSymbols.length) | 0];
+        heart.style.left = `${Math.random() * 100}vw`;
+        heart.style.fontSize = `${15 + Math.random() * 30}px`;
+        heart.style.animationDuration = `${3 + Math.random() * 5}s`;
+        fragment.appendChild(heart);
+
+        setTimeout(() => heart.remove(), 8000);
+    }
+
+    document.body.appendChild(fragment);
+}
+
+function createConfetti(count = 55) {
+    const colors = ["#ff4081","#ffd700","#ffffff","#ff80ab","#ba68c8"];
+    const fragment = document.createDocumentFragment();
+
+    for (let i = 0; i < count; i++) {
+        const confetti = document.createElement("div");
+        const duration = 2 + Math.random() * 4;
+
+        confetti.style.cssText = `
+            position:fixed;
+            width:7px;
+            height:7px;
+            left:${Math.random() * 100}vw;
+            top:-10px;
+            z-index:999;
+            border-radius:50%;
+            background:${colors[(Math.random() * colors.length) | 0]};
+        `;
+
+        confetti.animate(
+            [
+                { transform: "translate3d(0,0,0) rotate(0deg)" },
+                { transform: `translate3d(0,110vh,0) rotate(${Math.random() * 1000}deg)` }
+            ],
+            { duration: duration * 1000, easing: "linear", fill: "none" }
+        );
+
+        fragment.appendChild(confetti);
+        setTimeout(() => confetti.remove(), duration * 1000);
+    }
+
+    document.body.appendChild(fragment);
+}
+
+/* Initial ambient hearts: fewer nodes = less continuous animation work. */
+createHearts(10);
+
+/* =====================================================
+   SURPRISE
 ===================================================== */
 
 function showSurprise() {
+    const finalMessage = $("#finalMessage");
+    if (finalMessage) finalMessage.style.display = "block";
 
-
-    document.getElementById(
-        "finalMessage"
-    ).style.display = "block";
-
-
-    createHearts();
-
-    createConfetti();
-
+    createHearts(24);
+    createConfetti(55);
 
     window.scrollTo({
-
         top: document.body.scrollHeight,
-
         behavior: "smooth"
-
     });
-
 }
 
-
 /* =====================================================
-   FLOATING HEARTS
+   CINEMATIC INTRO
 ===================================================== */
-
-function createHearts() {
-
-
-    for (
-        let i = 0;
-        i < 35;
-        i++
-    ) {
-
-
-        const heart =
-            document.createElement("div");
-
-
-        heart.className =
-            "bg-heart";
-
-
-        const hearts = [
-
-            "❤️",
-            "💕",
-            "💖",
-            "💗",
-            "💓",
-            "🌹"
-
-        ];
-
-
-        heart.innerHTML =
-            hearts[
-                Math.floor(
-                    Math.random() *
-                    hearts.length
-                )
-            ];
-
-
-        heart.style.left =
-            Math.random() *
-            100 +
-            "vw";
-
-
-        heart.style.fontSize =
-            (15 +
-            Math.random() * 30) +
-            "px";
-
-
-        heart.style.animationDuration =
-            (3 +
-            Math.random() * 5) +
-            "s";
-
-
-        document.body.appendChild(
-            heart
-        );
-
-
-        setTimeout(() => {
-
-            heart.remove();
-
-        }, 8000);
-
-    }
-
-}
-
-
-/* =====================================================
-   CONFETTI
-===================================================== */
-
-function createConfetti() {
-
-
-    const colors = [
-
-        "#ff4081",
-        "#ffd700",
-        "#ffffff",
-        "#ff80ab",
-        "#ba68c8"
-
-    ];
-
-
-    for (
-        let i = 0;
-        i < 100;
-        i++
-    ) {
-
-
-        const confetti =
-            document.createElement("div");
-
-
-        confetti.style.position =
-            "fixed";
-
-
-        confetti.style.width =
-            "8px";
-
-
-        confetti.style.height =
-            "8px";
-
-
-        confetti.style.background =
-            colors[
-                Math.floor(
-                    Math.random() *
-                    colors.length
-                )
-            ];
-
-
-        confetti.style.left =
-            Math.random() *
-            100 +
-            "vw";
-
-
-        confetti.style.top =
-            "-10px";
-
-
-        confetti.style.zIndex =
-            "999";
-
-
-        confetti.style.borderRadius =
-            "50%";
-
-
-        const duration =
-            2 +
-            Math.random() * 4;
-
-
-        confetti.animate(
-
-            [
-
-                {
-                    transform:
-                        "translateY(0) rotate(0deg)"
-                },
-
-                {
-
-                    transform:
-                        `translateY(110vh) rotate(${Math.random() * 1000}deg)`
-
-                }
-
-            ],
-
-            {
-
-                duration:
-                    duration * 1000,
-
-                easing:
-                    "linear"
-
-            }
-
-        );
-
-
-        document.body.appendChild(
-            confetti
-        );
-
-
-        setTimeout(() => {
-
-            confetti.remove();
-
-        }, duration * 1000);
-
-    }
-
-}
-
-
-/* =====================================================
-   INITIAL HEARTS
-===================================================== */
-
-for (
-    let i = 0;
-    i < 15;
-    i++
-) {
-
-
-    const heart =
-        document.createElement("div");
-
-
-    heart.className =
-        "bg-heart";
-
-
-    heart.innerHTML =
-        "❤️";
-
-
-    heart.style.left =
-        Math.random() *
-        100 +
-        "vw";
-
-
-    heart.style.fontSize =
-        (15 +
-        Math.random() * 25) +
-        "px";
-
-
-    heart.style.animationDuration =
-        (5 +
-        Math.random() * 6) +
-        "s";
-
-
-    document.body.appendChild(
-        heart
-    );
-
-}
-
-
-/* =====================================================
-   FULL CINEMATIC EXPERIENCE
-   ===================================================== */
 
 function enterExperience() {
-    const intro = document.getElementById("cinematicIntro");
-    intro.classList.add("hide");
+    const intro = $("#cinematicIntro");
+    if (intro) intro.classList.add("hide");
 
-    const music = document.getElementById("music");
     if (music && music.paused) {
         music.play().then(() => {
-            musicButton.innerHTML = "🔊 Music On";
+            if (musicButton) musicButton.textContent = "🔊 Music On";
         }).catch(() => {});
     }
 
     setTimeout(() => {
-        document.querySelector(".hero")?.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-        });
+        $(".hero")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 550);
 }
 
-/* Scroll progress + top button */
-function updateCinematicUI() {
-    const scrollTop = window.scrollY;
-    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-    const progress = maxScroll > 0 ? (scrollTop / maxScroll) * 100 : 0;
+/* =====================================================
+   SCROLL UI — ONE rAF LOOP
+===================================================== */
 
-    const bar = document.getElementById("scrollProgress");
-    if (bar) bar.style.width = progress + "%";
+const scrollProgress = $("#scrollProgress");
+const topBtn = $("#topBtn");
+const heroContent = $(".hero-content");
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    const topBtn = document.getElementById("topBtn");
-    if (topBtn) topBtn.classList.toggle("show", scrollTop > 650);
-}
 let scrollTicking = false;
+let lastScrollY = -1;
 
 function updateCinematicFrame() {
     const scrollTop = window.scrollY;
-    const doc = document.documentElement;
-    const maxScroll = doc.scrollHeight - window.innerHeight;
-    const progress = maxScroll > 0 ? (scrollTop / maxScroll) * 100 : 0;
 
-    const bar = document.getElementById("scrollProgress");
-    if (bar) bar.style.width = progress + "%";
+    /* Avoid doing DOM writes when the scroll position did not change. */
+    if (scrollTop === lastScrollY) {
+        scrollTicking = false;
+        return;
+    }
+    lastScrollY = scrollTop;
 
-    const topBtn = document.getElementById("topBtn");
+    const maxScroll = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+    if (scrollProgress) {
+        scrollProgress.style.transform = `scaleX(${scrollTop / maxScroll})`;
+    }
+
     if (topBtn) topBtn.classList.toggle("show", scrollTop > 650);
 
-    const hero = document.querySelector(".hero-content");
-    if (hero && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        hero.style.transform = `translateY(${Math.min(scrollTop * .12, 55)}px)`;
-        hero.style.opacity = String(Math.max(.35, 1 - scrollTop / 750));
+    if (heroContent && !reduceMotion) {
+        const amount = Math.min(scrollTop * 0.12, 55);
+        heroContent.style.transform = `translate3d(0,${amount}px,0)`;
+        heroContent.style.opacity = String(Math.max(0.35, 1 - scrollTop / 750));
     }
 
     scrollTicking = false;
@@ -2681,197 +2564,212 @@ function requestCinematicFrame() {
     requestAnimationFrame(updateCinematicFrame);
 }
 
-window.addEventListener("scroll", requestCinematicFrame, {passive:true});
-updateCinematicFrame();
+addEventListener("scroll", requestCinematicFrame, { passive: true });
+requestCinematicFrame();
 
-/* Birthday countdown — next 27 August */
+/* =====================================================
+   COUNTDOWN
+===================================================== */
+
+const cdDays = $("#cdDays");
+const cdHours = $("#cdHours");
+const cdMinutes = $("#cdMinutes");
+const cdSeconds = $("#cdSeconds");
+
 function updateBirthdayCountdown() {
     const now = new Date();
-    let target = new Date(now.getFullYear(), 7, 27, 0, 0, 0);
+    let target = new Date(now.getFullYear(), 7, 27);
 
-    if (now >= target) {
-        target = new Date(now.getFullYear() + 1, 7, 27, 0, 0, 0);
-    }
+    if (now >= target) target = new Date(now.getFullYear() + 1, 7, 27);
 
-    const diff = target - now;
+    let diff = target - now;
     const days = Math.floor(diff / 86400000);
-    const hours = Math.floor((diff / 3600000) % 24);
-    const minutes = Math.floor((diff / 60000) % 60);
-    const seconds = Math.floor((diff / 1000) % 60);
+    diff -= days * 86400000;
+    const hours = Math.floor(diff / 3600000);
+    diff -= hours * 3600000;
+    const minutes = Math.floor(diff / 60000);
+    const seconds = Math.floor((diff % 60000) / 1000);
 
-    document.getElementById("cdDays").textContent = String(days).padStart(2,"0");
-    document.getElementById("cdHours").textContent = String(hours).padStart(2,"0");
-    document.getElementById("cdMinutes").textContent = String(minutes).padStart(2,"0");
-    document.getElementById("cdSeconds").textContent = String(seconds).padStart(2,"0");
+    if (cdDays) cdDays.textContent = String(days).padStart(2,"0");
+    if (cdHours) cdHours.textContent = String(hours).padStart(2,"0");
+    if (cdMinutes) cdMinutes.textContent = String(minutes).padStart(2,"0");
+    if (cdSeconds) cdSeconds.textContent = String(seconds).padStart(2,"0");
 }
+
 updateBirthdayCountdown();
 setInterval(updateBirthdayCountdown, 1000);
 
-/* Envelope */
-function openEnvelope() {
-    const envelope = document.getElementById("envelope");
-    const hint = document.getElementById("envelopeHint");
+/* =====================================================
+   ENVELOPE
+===================================================== */
 
+function openEnvelope() {
+    const envelope = $("#envelope");
+    const hint = $("#envelopeHint");
     if (!envelope) return;
 
-    const isOpen = envelope.classList.contains("open");
-
-    if (isOpen) {
-        envelope.classList.remove("open");
-        if (hint) hint.textContent = "Tap the envelope to open it.";
-    } else {
-        envelope.classList.add("open");
-        if (hint) hint.textContent = "Tap the envelope again to close it.";
+    const open = envelope.classList.toggle("open");
+    if (hint) {
+        hint.textContent = open
+            ? "Tap the envelope again to close it."
+            : "Tap the envelope to open it.";
     }
 }
 
-/* Full-screen ending */
+/* =====================================================
+   FINAL SCENE
+===================================================== */
+
 function openFinalScene() {
-    document.getElementById("finalScene").classList.add("show");
-    createHearts();
-    createConfetti();
-}
-function closeFinalScene() {
-    document.getElementById("finalScene").classList.remove("show");
+    const finalScene = $("#finalScene");
+    if (finalScene) finalScene.classList.add("show");
+    createHearts(24);
+    createConfetti(55);
 }
 
-/* Upgrade existing surprise to include cinematic finale */
+function closeFinalScene() {
+    const finalScene = $("#finalScene");
+    if (finalScene) finalScene.classList.remove("show");
+}
+
 const originalShowSurprise = showSurprise;
-showSurprise = function() {
+showSurprise = function () {
     originalShowSurprise();
     setTimeout(openFinalScene, 1200);
 };
 
-/* Escape closes cinematic scene */
-document.addEventListener("keydown", (e) => {
+document.addEventListener("keydown", e => {
     if (e.key === "Escape") closeFinalScene();
 });
 
+/* =====================================================
+   LETTER
+===================================================== */
 
-/* Letter readability helper */
+const letter = $(".envelope-letter");
+
 function updateLetterHint() {
-    const letter = document.querySelector(".envelope-letter");
     if (!letter) return;
-    letter.style.overflowY = letter.scrollHeight > letter.clientHeight ? "auto" : "hidden";
+    letter.style.overflowY =
+        letter.scrollHeight > letter.clientHeight ? "auto" : "hidden";
 }
-window.addEventListener("load", updateLetterHint);
-window.addEventListener("resize", updateLetterHint);
 
+addEventListener("load", updateLetterHint, { once: true });
+addEventListener("resize", updateLetterHint, { passive: true });
 
-/* =========================================================
+/* =====================================================
    DEVICE-AWARE PERFORMANCE
-   Only activates on constrained hardware.
-   ========================================================= */
+===================================================== */
+
 (() => {
-  const cores = navigator.hardwareConcurrency || 8;
-  const memory = navigator.deviceMemory || 8;
-  const smallScreen = Math.min(innerWidth, innerHeight) < 700;
-  if (cores <= 4 || memory <= 4) {
-    document.documentElement.classList.add("pro-low-power");
-  }
-  /* Avoid keeping large offscreen videos actively composited. */
-  document.querySelectorAll("video").forEach(video => {
-    video.setAttribute("preload", "metadata");
-  });
-})();
+    const cores = navigator.hardwareConcurrency || 8;
+    const memory = navigator.deviceMemory || 8;
 
-/* =========================================================
-   V2 MOTION ENGINE
-   ========================================================= */
-(() => {
-  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (cores <= 4 || memory <= 4) {
+        document.documentElement.classList.add("pro-low-power");
+    }
 
-  const targets = document.querySelectorAll(
-    "section,.section-title,.cinematic-divider,.photo-container,.video-card," +
-    ".message-box,.letter,.memory-timeline,.memory-item,.reason-card," +
-    ".countdown-wrap,.envelope-area,.surprise"
-  );
-
-  targets.forEach((el,i) => {
-    el.classList.add("v2-reveal");
-    el.style.transitionDelay = `${Math.min((i % 5) * 70, 280)}ms`;
-  });
-
-  if (!reduce && "IntersectionObserver" in window) {
-    const io = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add("v2-visible");
-        io.unobserve(entry.target);
-      });
-    }, {threshold:.13,rootMargin:"0px 0px -8% 0px"});
-
-    document.querySelectorAll(".v2-reveal").forEach(el => io.observe(el));
-  } else {
-    document.querySelectorAll(".v2-reveal").forEach(el => el.classList.add("v2-visible"));
-  }
-
-  /* Desktop spotlight */
-  if (!reduce && matchMedia("(pointer:fine)").matches) {
-    const light = document.createElement("div");
-    light.className = "v2-cursor-light";
-    document.body.appendChild(light);
-
-    let pointerX = innerWidth / 2;
-    let pointerY = innerHeight / 2;
-    let pointerTicking = false;
-
-    addEventListener("pointermove", e => {
-      pointerX = e.clientX;
-      pointerY = e.clientY;
-
-      if (pointerTicking) return;
-      pointerTicking = true;
-
-      requestAnimationFrame(() => {
-        light.style.left = pointerX + "px";
-        light.style.top = pointerY + "px";
-        document.documentElement.style.setProperty("--v2-mx", `${pointerX/innerWidth*100}%`);
-        document.documentElement.style.setProperty("--v2-my", `${pointerY/innerHeight*100}%`);
-        pointerTicking = false;
-      });
-    }, {passive:true});
-  }
-
-  /* Desktop 3D card tilt */
-  if (!reduce && matchMedia("(pointer:fine) and (min-width:801px)").matches) {
-    document.querySelectorAll(".reason-card,.memory-card,.video-card,.count-box").forEach(card => {
-      let rect = null;
-      let pointerX = 0;
-      let pointerY = 0;
-      let tiltTicking = false;
-
-      card.addEventListener("pointerenter", () => {
-        rect = card.getBoundingClientRect();
-      }, {passive:true});
-
-      card.addEventListener("pointermove", e => {
-        pointerX = e.clientX;
-        pointerY = e.clientY;
-
-        if (!rect) rect = card.getBoundingClientRect();
-        if (tiltTicking) return;
-        tiltTicking = true;
-
-        requestAnimationFrame(() => {
-          const rx = ((pointerY - rect.top) / rect.height - .5) * -4;
-          const ry = ((pointerX - rect.left) / rect.width - .5) * 4;
-          card.style.transform =
-            `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-7px) scale(1.015)`;
-          tiltTicking = false;
-        });
-      }, {passive:true});
-
-      card.addEventListener("pointerleave", () => {
-        rect = null;
-        card.style.transform = "";
-      });
+    /* Metadata only: video data is not downloaded until the user plays it. */
+    $$("video").forEach(video => {
+        video.preload = "metadata";
     });
-  }
-
-  /* Hero parallax is handled by the shared rAF scroll loop above. */
 })();
 
+/* =====================================================
+   V2 REVEAL ENGINE
+===================================================== */
+
+(() => {
+    const targets = $$(
+        "section,.section-title,.cinematic-divider,.photo-container,.video-card," +
+        ".message-box,.letter,.memory-timeline,.memory-item,.reason-card," +
+        ".countdown-wrap,.envelope-area,.surprise"
+    );
+
+    targets.forEach((el, i) => {
+        el.classList.add("v2-reveal");
+        el.style.transitionDelay = `${Math.min((i % 4) * 55, 165)}ms`;
+    });
+
+    if (!reduceMotion && "IntersectionObserver" in window) {
+        const io = new IntersectionObserver(entries => {
+            for (const entry of entries) {
+                if (!entry.isIntersecting) continue;
+                entry.target.classList.add("v2-visible");
+                io.unobserve(entry.target);
+            }
+        }, { threshold: 0.08, rootMargin: "0px 0px -5% 0px" });
+
+        targets.forEach(el => io.observe(el));
+    } else {
+        targets.forEach(el => el.classList.add("v2-visible"));
+    }
+
+    /* Cursor spotlight: move one element only.
+       Do not update CSS variables on body::after every pointer event. */
+    if (!reduceMotion && matchMedia("(pointer:fine)").matches &&
+        !document.documentElement.classList.contains("pro-low-power")) {
+
+        const light = document.createElement("div");
+        light.className = "v2-cursor-light";
+        document.body.appendChild(light);
+
+        let x = innerWidth / 2;
+        let y = innerHeight / 2;
+        let raf = 0;
+
+        addEventListener("pointermove", e => {
+            x = e.clientX;
+            y = e.clientY;
+
+            if (raf) return;
+            raf = requestAnimationFrame(() => {
+                light.style.transform =
+                    `translate3d(${x - 110}px,${y - 110}px,0)`;
+                raf = 0;
+            });
+        }, { passive: true });
+    }
+
+    /* Desktop 3D card tilt, throttled to one frame. */
+    if (!reduceMotion && matchMedia("(pointer:fine) and (min-width:801px)").matches &&
+        !document.documentElement.classList.contains("pro-low-power")) {
+
+        $$(".reason-card,.memory-card,.video-card,.count-box").forEach(card => {
+            let rect = null;
+            let x = 0, y = 0, raf = 0;
+
+            card.addEventListener("pointerenter", () => {
+                rect = card.getBoundingClientRect();
+            }, { passive: true });
+
+            card.addEventListener("pointermove", e => {
+                x = e.clientX;
+                y = e.clientY;
+                if (raf) return;
+
+                raf = requestAnimationFrame(() => {
+                    if (!rect) rect = card.getBoundingClientRect();
+
+                    const rx = ((y - rect.top) / rect.height - .5) * -4;
+                    const ry = ((x - rect.left) / rect.width - .5) * 4;
+
+                    card.style.transform =
+                        `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-7px) scale(1.015)`;
+
+                    raf = 0;
+                });
+            }, { passive: true });
+
+            card.addEventListener("pointerleave", () => {
+                rect = null;
+                if (raf) cancelAnimationFrame(raf);
+                raf = 0;
+                card.style.transform = "";
+            });
+        });
+    }
+})();
 </script>
 
 
